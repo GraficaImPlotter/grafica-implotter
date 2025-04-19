@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Produtos</title>
+</head>
+<body>
+  <h1>Cadastro de Produtos</h1>
+
+  <form method="post" action="/produtos">
+    <input type="text" name="nome" placeholder="Nome do Produto" required>
+    <input type="text" name="descricao" placeholder="Descrição">
+    <input type="number" name="preco_compra" placeholder="Preço de Compra" step="0.01" required>
+    <input type="number" name="preco_venda" placeholder="Preço de Venda" step="0.01" required>
+    <input type="text" name="unidade" placeholder="Unidade (ex: un, m²)" value="un">
+    <button type="submit">Adicionar Produto</button>
+  </form>
+
+  <h2>Lista de Produtos</h2>
+  <ul>
+    {% for produto in produtos %}
+      <li>{{ produto.nome }} - {{ produto.preco_venda }} ({{ produto.unidade }})</li>
+    {% endfor %}
+  </ul>
+
+  <a href="/painel">← Voltar ao Painel</a>
+</body>
+</html>
