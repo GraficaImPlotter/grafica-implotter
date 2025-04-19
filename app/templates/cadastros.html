@@ -2,65 +2,32 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Cadastros | Gráfica Implotter</title>
+  <title>Painel | Gráfica Implotter</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background-color: #f4f4f4;
-    }
-    header {
-      background-color: #2c3e50;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    .container {
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    h2 {
-      margin-bottom: 20px;
-    }
-    .botoes {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .botoes a {
-      padding: 15px 25px;
-      background-color: #2980b9;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-    .botoes a:hover {
-      background-color: #1c5980;
-    }
-    .voltar {
-      margin-top: 30px;
-    }
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .conteudo { padding: 30px; text-align: center; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Área de Cadastros</h1>
+    <h1>Bem-vindo à Gráfica Implotter</h1>
   </header>
-  <div class="container">
-    <h2>Escolha o que deseja gerenciar</h2>
-    <div class="botoes">
-      <a href="/clientes">👤 Clientes</a>
-      <a href="/produtos">📦 Produtos</a>
-      <!-- Adicione mais opções conforme necessário -->
-    </div>
-    <div class="voltar">
-      <a href="/painel">← Voltar ao Painel</a>
-    </div>
+  <nav>
+    <a href="/cadastros">🧾 Cadastros</a>
+    <a href="#">💸 Vendas</a>
+    <a href="#">📋 Orçamentos</a>
+    <a href="#">📊 Financeiro</a>
+    <a href="/produtos">📦 Produtos</a>
+    <a href="#">⚙️ Configurações</a>
+    <a href="/logout">🔓 Sair</a>
+  </nav>
+  <div class="conteudo">
+    <h2>Painel Principal</h2>
+    <p>Escolha uma opção no menu acima para começar.</p>
   </div>
 </body>
 </html>
