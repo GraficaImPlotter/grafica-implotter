@@ -49,6 +49,8 @@ async def on_startup():
         existe = resultado.scalar_one_or_none()
         if not existe:
             novo_admin = Usuario(
-                nome="Administrador",
-                email="graficaimplotter@gmail.com",
-                senha_hash=ge
+    nome="Administrador",
+    email="graficaimplotter@gmail.com",
+    senha_hash=gerar_hash_senha("admin123"),
+    admin=True
+)
