@@ -4,7 +4,6 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.dependencies import get_usuario_logado
 from app.database import get_db
-from app.models.cliente import Cliente
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
