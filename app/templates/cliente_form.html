@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastrar Cliente | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    .container { max-width: 600px; margin: 30px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; }
+    form label { display: block; margin-top: 15px; font-weight: bold; }
+    form input { width: 100%; padding: 8px; margin-top: 5px; }
+    form button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: #1a242f;
+    }
+    a { display: inline-block; margin-top: 20px; text-decoration: none; color: #2c3e50; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cadastrar Cliente</h1>
+  </header>
+  <div class="container">
+    <form action="/clientes/novo" method="post">
+      <label>Nome:</label>
+      <input type="text" name="nome" required>
+
+      <label>Email:</label>
+      <input type="email" name="email" required>
+
+      <label>Telefone:</label>
+      <input type="text" name="telefone" required>
+
+      <label>CPF ou CNPJ:</label>
+      <input type="text" name="cpf_cnpj" required>
+
+      <label>Endereço:</label>
+      <input type="text" name="endereco" required>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <a href="/clientes">← Voltar para lista de clientes</a>
+  </div>
+</body>
+</html>
