@@ -7,10 +7,10 @@ from app.database import engine, Base, get_db
 from app.auth.routes import router as auth_router
 from app.auth.dependencies import get_usuario_logado
 from app.routes.produtos import router as produtos_router
-from app.routes.clientes import router as clientes_router  # clientes
+from app.routes.clientes import router as clientes_router
 from app.auth.models import Usuario
 from app.auth.utils import gerar_hash_senha
-from app.initial_data.produtos import inserir_produtos_iniciais  # <-- corrigido
+from app.initial_data.produtos import inserir_produtos_iniciais
 from sqlalchemy.future import select
 
 # Templates
@@ -32,10 +32,15 @@ app.include_router(clientes_router)
 def home():
     return {"mensagem": "Sistema da Gráfica Implotter Online Iniciado"}
 
-# Painel após login
+# Painel principal
 @app.get("/painel", response_class=HTMLResponse)
 async def painel(request: Request, usuario=Depends(get_usuario_logado)):
     return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
+
+# Tela central de cadastros
+@app.get("/cadastros", response_class=HTMLResponse)
+async def tela_cadastros(request: Request, usuario=Depends(get_usuario_logado)):
+    return templates.TemplateResponse("cadastros.html", {"request": request, "usuario": usuario})
 
 # Evento ao iniciar o app
 @app.on_event("startup")
@@ -57,5 +62,5 @@ async def on_startup():
             db.add(novo_admin)
             await db.commit()
 
-    # Importa os produtos iniciais
+    # Importa produtos iniciais
     await inserir_produtos_iniciais()
