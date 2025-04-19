@@ -7,9 +7,10 @@ from app.database import engine, Base, get_db
 from app.auth.routes import router as auth_router
 from app.auth.dependencies import get_usuario_logado
 from app.routes.produtos import router as produtos_router
+from app.routes.clientes import router as clientes_router
 from app.auth.models import Usuario
 from app.auth.utils import gerar_hash_senha
-from app.initial_data.produtos_novos import inserir_produtos_novos  # <- Importação correta
+from app.initial_data import inserir_produtos_iniciais
 from sqlalchemy.future import select
 
 # Templates
@@ -24,6 +25,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # Rotas
 app.include_router(auth_router)
 app.include_router(produtos_router)
+app.include_router(clientes_router)
 
 # Página inicial
 @app.get("/")
@@ -49,11 +51,4 @@ async def on_startup():
             novo_admin = Usuario(
                 nome="Administrador",
                 email="graficaimplotter@gmail.com",
-                senha_hash=gerar_hash_senha("admin123"),
-                admin=True
-            )
-            db.add(novo_admin)
-            await db.commit()
-
-    # Importação dos produtos novos
-    await inserir_produtos_novos()
+                senha_hash=ge
