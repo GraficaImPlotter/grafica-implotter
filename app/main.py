@@ -5,9 +5,10 @@ from fastapi.staticfiles import StaticFiles
 
 from app.database import engine, Base, get_db
 from app.auth.routes import router as auth_router
-from app.auth.dependencies import get_usuario_logado
 from app.routes.produtos import router as produtos_router
 from app.routes.clientes import router as clientes_router
+from app.routes.cadastros import router as cadastros_router
+from app.auth.dependencies import get_usuario_logado
 from app.auth.models import Usuario
 from app.auth.utils import gerar_hash_senha
 from app.initial_data.produtos import inserir_produtos_iniciais
@@ -26,6 +27,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.include_router(auth_router)
 app.include_router(produtos_router)
 app.include_router(clientes_router)
+app.include_router(cadastros_router)
 
 # Página inicial
 @app.get("/")
@@ -36,11 +38,6 @@ def home():
 @app.get("/painel", response_class=HTMLResponse)
 async def painel(request: Request, usuario=Depends(get_usuario_logado)):
     return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
-
-# Página de cadastros
-@app.get("/cadastros", response_class=HTMLResponse)
-async def cadastros(request: Request, usuario=Depends(get_usuario_logado)):
-    return templates.TemplateResponse("cadastros.html", {"request": request, "usuario": usuario})
 
 # Evento ao iniciar o app
 @app.on_event("startup")
@@ -64,5 +61,3 @@ async def on_startup():
 
     # Importa produtos iniciais
     await inserir_produtos_iniciais()
-from app.routes.clientes import router as clientes_router
-app.include_router(clientes_router)

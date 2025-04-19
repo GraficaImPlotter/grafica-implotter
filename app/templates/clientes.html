@@ -1,12 +1,36 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Clientes | Gráfica Implotter</title>
+    <meta charset="UTF-8">
+    <title>Clientes</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #eee; }
+        a { text-decoration: none; color: #007BFF; }
+    </style>
 </head>
 <body>
-  <h1>Clientes</h1>
-  <p>Listagem de clientes (em breve).</p>
-  <a href="/painel">⬅️ Voltar ao Painel</a>
+    <h1>Lista de Clientes</h1>
+    <a href="/painel">← Voltar</a>
+    <table>
+        <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>CPF/CNPJ</th>
+            <th>Endereço</th>
+        </tr>
+        {% for cliente in clientes %}
+        <tr>
+            <td>{{ cliente.nome }}</td>
+            <td>{{ cliente.email }}</td>
+            <td>{{ cliente.telefone }}</td>
+            <td>{{ cliente.cpf_cnpj }}</td>
+            <td>{{ cliente.endereco }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
