@@ -9,8 +9,7 @@ from app.auth.dependencies import get_usuario_logado
 from app.routes.produtos import router as produtos_router
 from app.auth.models import Usuario
 from app.auth.utils import gerar_hash_senha
-from app.initial_data import inserir_produtos_iniciais
-from app.initial_data.produtos_novos import inserir_produtos_novos  # <-- NOVO
+from app.initial_data.produtos_novos import inserir_produtos_novos  # <- Importação correta
 from sqlalchemy.future import select
 
 # Templates
@@ -56,8 +55,5 @@ async def on_startup():
             db.add(novo_admin)
             await db.commit()
 
-    # Importa produtos iniciais
-    await inserir_produtos_iniciais()
-
-    # Importa produtos novos
-    await inserir_produtos_novos()  # <-- NOVO
+    # Importação dos produtos novos
+    await inserir_produtos_novos()
