@@ -64,3 +64,5 @@ async def on_startup():
 
     # Importa produtos iniciais
     await inserir_produtos_iniciais()
+from app.routes.clientes import router as clientes_router
+app.include_router(clientes_router)
