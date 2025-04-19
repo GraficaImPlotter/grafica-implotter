@@ -7,10 +7,10 @@ from app.database import engine, Base, get_db
 from app.auth.routes import router as auth_router
 from app.auth.dependencies import get_usuario_logado
 from app.routes.produtos import router as produtos_router
-from app.routes.clientes import router as clientes_router
+from app.routes.clientes import router as clientes_router  # clientes
 from app.auth.models import Usuario
 from app.auth.utils import gerar_hash_senha
-from app.initial_data import inserir_produtos_iniciais
+from app.initial_data.produtos import inserir_produtos_iniciais  # <-- corrigido
 from sqlalchemy.future import select
 
 # Templates
@@ -49,8 +49,13 @@ async def on_startup():
         existe = resultado.scalar_one_or_none()
         if not existe:
             novo_admin = Usuario(
-    nome="Administrador",
-    email="graficaimplotter@gmail.com",
-    senha_hash=gerar_hash_senha("admin123"),
-    admin=True
-)
+                nome="Administrador",
+                email="graficaimplotter@gmail.com",
+                senha_hash=gerar_hash_senha("admin123"),
+                admin=True
+            )
+            db.add(novo_admin)
+            await db.commit()
+
+    # Importa os produtos iniciais
+    await inserir_produtos_iniciais()
