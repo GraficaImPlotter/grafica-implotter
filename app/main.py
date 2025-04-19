@@ -51,3 +51,5 @@ async def on_startup():
             )
             db.add(novo_admin)
             await db.commit()
+from app.routes.produtos import router as produtos_router
+app.include_router(produtos_router)

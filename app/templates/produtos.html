@@ -8,21 +8,18 @@
   <h1>Cadastro de Produtos</h1>
 
   <form method="post" action="/produtos">
-    <input type="text" name="nome" placeholder="Nome do Produto" required>
-    <input type="text" name="descricao" placeholder="Descrição">
-    <input type="number" name="preco_compra" placeholder="Preço de Compra" step="0.01" required>
-    <input type="number" name="preco_venda" placeholder="Preço de Venda" step="0.01" required>
-    <input type="text" name="unidade" placeholder="Unidade (ex: un, m²)" value="un">
-    <button type="submit">Adicionar Produto</button>
+    <input type="text" name="nome" placeholder="Nome do produto" required>
+    <input type="number" step="0.01" name="preco" placeholder="Preço" required>
+    <button type="submit">Cadastrar</button>
   </form>
 
   <h2>Lista de Produtos</h2>
   <ul>
     {% for produto in produtos %}
-      <li>{{ produto.nome }} - {{ produto.preco_venda }} ({{ produto.unidade }})</li>
+      <li>{{ produto.nome }} - R$ {{ "%.2f"|format(produto.preco) }}</li>
     {% endfor %}
   </ul>
 
-  <a href="/painel">← Voltar ao Painel</a>
+  <a href="/painel">← Voltar ao painel</a>
 </body>
 </html>
