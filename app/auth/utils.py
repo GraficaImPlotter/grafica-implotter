@@ -1,18 +1,12 @@
-import os
-from datetime import datetime, timedelta
-from jose import jwt
 from passlib.context import CryptContext
-from dotenv import load_dotenv
+from jose import jwt
+from datetime import datetime, timedelta
+import os
 
-# Carrega variáveis do .env
-load_dotenv()
-
-# Usa a mesma SECRET_KEY que será usada na validação do token
-SECRET_KEY = os.getenv("SECRET_KEY", "segredo-super-seguro")
+SECRET_KEY = os.getenv("SECRET_KEY", "grafica_secret_key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-# Criptografia de senhas
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verificar_senha(senha, senha_hash):
