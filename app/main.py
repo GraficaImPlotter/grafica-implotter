@@ -9,36 +9,39 @@ from app.auth.dependencies import get_usuario_logado
 from app.routes.produtos import router as produtos_router
 from app.auth.models import Usuario
 from app.auth.utils import gerar_hash_senha
+from app.initial_data import inserir_produtos_iniciais
 from sqlalchemy.future import select
 
+# Templates
 templates = Jinja2Templates(directory="app/templates")
 
+# App
 app = FastAPI()
 
-# Static files
+# Arquivos estáticos
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Rotas de autenticação
+# Rotas
 app.include_router(auth_router)
-
-# Rotas dos módulos
 app.include_router(produtos_router)
 
+# Página inicial
 @app.get("/")
 def home():
     return {"mensagem": "Sistema da Gráfica Implotter Online Iniciado"}
 
+# Painel após login
 @app.get("/painel", response_class=HTMLResponse)
 async def painel(request: Request, usuario=Depends(get_usuario_logado)):
     return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
 
-# Cria as tabelas no banco automaticamente ao iniciar
+# Evento ao iniciar o app
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    # Cria usuário admin se não existir
+    # Criação automática do admin
     async for db in get_db():
         resultado = await db.execute(select(Usuario).where(Usuario.email == "graficaimplotter@gmail.com"))
         existe = resultado.scalar_one_or_none()
@@ -51,5 +54,6 @@ async def on_startup():
             )
             db.add(novo_admin)
             await db.commit()
-from app.routes.produtos import router as produtos_router
-app.include_router(produtos_router)
+
+    # Importa produtos iniciais
+    await inserir_produtos_iniciais()
