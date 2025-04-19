@@ -1,2 +1,7 @@
-# Exemplo de código do sistema da gráfica online
-print('Sistema da Gráfica Online Iniciado')
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def home():
+    return {"mensagem": "Sistema da Gráfica Implotter Online Iniciado"}
