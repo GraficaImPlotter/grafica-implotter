@@ -1,44 +1,33 @@
-from fastapi import APIRouter, Request, Depends, Form
+from fastapi import APIRouter, Request, Form, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.database import get_db
-from app.auth.utils import verificar_senha, criar_token
 from app.auth.models import Usuario
+from app.auth.utils import verificar_senha, criar_token
 from fastapi.templating import Jinja2Templates
 
-router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
+router = APIRouter()
 
-# Página de login (GET)
 @router.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
-# Processa o login (POST)
 @router.post("/login")
-async def login(
-    request: Request,
-    db: AsyncSession = Depends(get_db),
-):
-    form = await request.form()
-    email = form.get("email")
-    senha = form.get("senha")
-
+async def login(request: Request, email: str = Form(...), senha: str = Form(...), db: AsyncSession = Depends(get_db)):
     resultado = await db.execute(select(Usuario).where(Usuario.email == email))
     usuario = resultado.scalar_one_or_none()
 
     if not usuario or not verificar_senha(senha, usuario.senha_hash):
-        return templates.TemplateResponse(
-            "login.html",
-            {"request": request, "erro": "Credenciais inválidas"},
-            status_code=401,
-        )
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "erro": "E-mail ou senha inválidos"
+        })
 
-    # Cria o token JWT
-    token = criar_token({"sub": usuario.email})
+    # Aqui usamos o ID do usuário, e não o e-mail
+    token = criar_token({"sub": str(usuario.id)})
 
-    # Redireciona para o painel e armazena o token em um cookie
-    response = RedirectResponse(url="/painel", status_code=302)
+    response = RedirectResponse(url="/painel", status_code=status.HTTP_302_FOUND)
     response.set_cookie(key="token", value=token, httponly=True)
     return response
