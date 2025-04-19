@@ -3,17 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <title>{% if cliente %}Editar{% else %}Novo{% endif %} Cliente</title>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .conteudo { padding: 30px; text-align: center; }
+    form { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input, textarea { width: 100%; padding: 10px; margin: 10px 0; }
+    button { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; }
+    button:hover { background: #2ecc71; }
+  </style>
 </head>
 <body>
-  <h1>{% if cliente %}Editar{% else %}Novo{% endif %} Cliente</h1>
-  <form method="post">
-    <label>Nome: <input type="text" name="nome" value="{{ cliente.nome if cliente else '' }}" required></label><br>
-    <label>Email: <input type="email" name="email" value="{{ cliente.email if cliente else '' }}"></label><br>
-    <label>Telefone: <input type="text" name="telefone" value="{{ cliente.telefone if cliente else '' }}"></label><br>
-    <label>CPF/CNPJ: <input type="text" name="cpf_cnpj" value="{{ cliente.cpf_cnpj if cliente else '' }}"></label><br>
-    <label>Endereço: <input type="text" name="endereco" value="{{ cliente.endereco if cliente else '' }}"></label><br>
-    <button type="submit">Salvar</button>
-  </form>
-  <a href="/clientes">← Voltar</a>
+  <header>
+    <h1>{% if cliente %}Editar{% else %}Novo{% endif %} Cliente</h1>
+  </header>
+  <nav>
+    <a href="/painel">🏠 Início</a>
+    <a href="/cadastros">🧾 Cadastros</a>
+    <a href="/clientes">👥 Clientes</a>
+    <a href="/logout">🔓 Sair</a>
+  </nav>
+  <div class="conteudo">
+    <form method="post">
+      <input type="text" name="nome" placeholder="Nome" value="{{ cliente.nome if cliente else '' }}" required>
+      <input type="email" name="email" placeholder="E-mail" value="{{ cliente.email if cliente else '' }}">
+      <input type="text" name="telefone" placeholder="Telefone" value="{{ cliente.telefone if cliente else '' }}">
+      <input type="text" name="cpf_cnpj" placeholder="CPF ou CNPJ" value="{{ cliente.cpf_cnpj if cliente else '' }}">
+      <textarea name="endereco" placeholder="Endereço">{{ cliente.endereco if cliente else '' }}</textarea>
+      <button type="submit">Salvar</button>
+    </form>
+  </div>
 </body>
 </html>

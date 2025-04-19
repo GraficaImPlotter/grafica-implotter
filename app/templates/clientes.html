@@ -2,17 +2,59 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Clientes</title>
+  <title>Clientes | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .conteudo { padding: 30px; text-align: center; }
+    table { width: 90%; margin: auto; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    th { background: #2c3e50; color: white; }
+    a.botao { background: #2980b9; color: white; padding: 6px 10px; border-radius: 5px; text-decoration: none; }
+    a.botao:hover { background: #3498db; }
+    .topo { margin-bottom: 20px; display: flex; justify-content: center; gap: 20px; }
+  </style>
 </head>
 <body>
-  <h1>Clientes Cadastrados</h1>
-  <a href="/painel">← Voltar</a> | <a href="/clientes/novo">+ Novo Cliente</a>
-  <ul>
-    {% for cliente in clientes %}
-      <li>
-        {{ cliente.nome }} - {{ cliente.email }} - <a href="/clientes/editar/{{ cliente.id }}">Editar</a>
-      </li>
-    {% endfor %}
-  </ul>
+  <header>
+    <h1>Clientes</h1>
+  </header>
+  <nav>
+    <a href="/painel">🏠 Início</a>
+    <a href="/cadastros">🧾 Cadastros</a>
+    <a href="/clientes">👥 Clientes</a>
+    <a href="/produtos">📦 Produtos</a>
+    <a href="/logout">🔓 Sair</a>
+  </nav>
+  <div class="conteudo">
+    <div class="topo">
+      <a class="botao" href="/clientes/novo">➕ Novo Cliente</a>
+    </div>
+    <table>
+      <tr>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Telefone</th>
+        <th>CPF/CNPJ</th>
+        <th>Endereço</th>
+        <th>Ações</th>
+      </tr>
+      {% for cliente in clientes %}
+      <tr>
+        <td>{{ cliente.nome }}</td>
+        <td>{{ cliente.email }}</td>
+        <td>{{ cliente.telefone }}</td>
+        <td>{{ cliente.cpf_cnpj }}</td>
+        <td>{{ cliente.endereco }}</td>
+        <td>
+          <a class="botao" href="/clientes/editar/{{ cliente.id }}">✏️ Editar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
 </body>
 </html>
