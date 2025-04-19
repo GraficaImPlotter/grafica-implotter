@@ -10,6 +10,7 @@ from app.routes.produtos import router as produtos_router
 from app.auth.models import Usuario
 from app.auth.utils import gerar_hash_senha
 from app.initial_data import inserir_produtos_iniciais
+from app.initial_data.produtos_novos import inserir_produtos_novos  # <-- NOVO
 from sqlalchemy.future import select
 
 # Templates
@@ -39,8 +40,6 @@ async def painel(request: Request, usuario=Depends(get_usuario_logado)):
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
-        # ⚠️ Apaga todas as tabelas e recria do zero
-        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
     # Criação automática do admin
@@ -59,3 +58,6 @@ async def on_startup():
 
     # Importa produtos iniciais
     await inserir_produtos_iniciais()
+
+    # Importa produtos novos
+    await inserir_produtos_novos()  # <-- NOVO
