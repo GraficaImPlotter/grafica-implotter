@@ -10,3 +10,5 @@ reportlab
 pandas
 openpyxl
 passlib[bcrypt]
+python-jose
+
