@@ -31,3 +31,8 @@ async def login(request: Request, email: str = Form(...), senha: str = Form(...)
     response = RedirectResponse(url="/painel", status_code=status.HTTP_302_FOUND)
     response.set_cookie(key="token", value=token, httponly=True)
     return response
+@router.get("/logout")
+def logout():
+    response = RedirectResponse(url="/login", status_code=302)
+    response.delete_cookie("token")
+    return response
