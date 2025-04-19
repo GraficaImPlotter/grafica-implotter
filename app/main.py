@@ -32,14 +32,14 @@ app.include_router(clientes_router)
 def home():
     return {"mensagem": "Sistema da Gráfica Implotter Online Iniciado"}
 
-# Painel principal
+# Painel após login
 @app.get("/painel", response_class=HTMLResponse)
 async def painel(request: Request, usuario=Depends(get_usuario_logado)):
     return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
 
-# Tela central de cadastros
+# Página de cadastros
 @app.get("/cadastros", response_class=HTMLResponse)
-async def tela_cadastros(request: Request, usuario=Depends(get_usuario_logado)):
+async def cadastros(request: Request, usuario=Depends(get_usuario_logado)):
     return templates.TemplateResponse("cadastros.html", {"request": request, "usuario": usuario})
 
 # Evento ao iniciar o app
