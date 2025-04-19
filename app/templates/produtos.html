@@ -4,38 +4,54 @@
   <meta charset="UTF-8">
   <title>Produtos | Gráfica Implotter</title>
   <style>
-    body { font-family: Arial; background: #f4f4f4; margin: 0; padding: 0; }
-    header, nav { background: #2c3e50; color: white; padding: 20px; text-align: center; }
-    table { width: 90%; margin: 20px auto; border-collapse: collapse; background: white; }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-    th { background: #34495e; color: white; }
+    body { font-family: Arial; background: #f4f4f4; margin: 0; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .conteudo { padding: 30px; max-width: 900px; margin: auto; background: white; border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #ecf0f1; }
+    .botoes a { margin-right: 10px; }
+    .novo-btn { background: #27ae60; color: white; padding: 8px 12px; text-decoration: none; border-radius: 5px; }
   </style>
 </head>
 <body>
   <header>
     <h1>Produtos Cadastrados</h1>
   </header>
-  <table>
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Tipo</th>
-        <th>Valor Compra</th>
-        <th>Valor Venda</th>
-        <th>Unidade</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for produto in produtos %}
+  <nav>
+    <a href="/painel">🏠 Início</a>
+    <a href="/cadastros">🧾 Cadastros</a>
+    <a href="/produtos/novo" class="novo-btn">➕ Novo Produto</a>
+  </nav>
+  <div class="conteudo">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Valor Compra</th>
+          <th>Valor Venda</th>
+          <th>Por m²</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for produto in produtos %}
         <tr>
           <td>{{ produto.nome }}</td>
-          <td>{{ produto.tipo }}</td>
-          <td>R$ {{ "%.2f"|format(produto.valor_compra) }}</td>
-          <td>R$ {{ "%.2f"|format(produto.valor_venda) }}</td>
-          <td>{{ produto.unidade }}</td>
+          <td>R$ {{ '%.2f'|format(produto.valor_compra) }}</td>
+          <td>R$ {{ '%.2f'|format(produto.valor_venda) }}</td>
+          <td>{{ 'Sim' if produto.por_m2 else 'Não' }}</td>
+          <td class="botoes">
+            <a href="/produtos/{{ produto.id }}/editar">✏️ Editar</a>
+            <a href="/produtos/{{ produto.id }}/excluir" onclick="return confirm('Tem certeza que deseja excluir este produto?')">❌ Excluir</a>
+          </td>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </body>
 </html>
