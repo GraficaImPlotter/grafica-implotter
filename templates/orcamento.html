@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Orçamento</title>
+</head>
+<body>
+  <h2>Orçamento - {{ empresa.nome }}</h2>
+  <p><strong>Cliente:</strong> {{ cliente.nome }}</p>
+  <hr>
+  <ul>
+    {% for item in orcamento.itens %}
+    <li>{{ item.nome }} - {{ item.quantidade }} x R$ {{ item.preco_unitario }}</li>
+    {% endfor %}
+  </ul>
+  <p><strong>Total:</strong> R$ {{ orcamento.total }}</p>
+  <p><strong>Validade:</strong> {{ orcamento.validade }} dias</p>
+</body>
+</html>

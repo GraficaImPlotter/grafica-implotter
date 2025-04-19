@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Comprovante de Venda</title>
+</head>
+<body>
+  <h2>{{ empresa.nome }}</h2>
+  <p><strong>CNPJ:</strong> {{ empresa.cnpj }}</p>
+  <p><strong>Endereço:</strong> {{ empresa.endereco }}</p>
+  <p><strong>Email:</strong> {{ empresa.email }}</p>
+  <p><strong>WhatsApp:</strong> {{ empresa.whatsapp }}</p>
+  <hr>
+  <h3>Cliente: {{ cliente.nome }}</h3>
+  <p><strong>Forma de Pagamento:</strong> {{ venda.forma_pagamento }}</p>
+  <p><strong>Status:</strong> {{ venda.status }}</p>
+  <hr>
+  <h3>Itens:</h3>
+  <ul>
+    {% for item in venda.itens %}
+    <li>{{ item.nome }} - {{ item.quantidade }} x R$ {{ item.preco_unitario }}</li>
+    {% endfor %}
+  </ul>
+  <p><strong>Total:</strong> R$ {{ venda.total }}</p>
+  <p><strong>Observações:</strong> {{ venda.observacoes }}</p>
+</body>
+</html>
