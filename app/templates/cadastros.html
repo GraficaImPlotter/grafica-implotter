@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Painel | Gráfica Implotter</title>
+  <title>Cadastros | Gráfica Implotter</title>
   <style>
     body { font-family: Arial; margin: 0; background: #f4f4f4; }
     header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
@@ -10,24 +10,41 @@
     nav a { color: white; text-decoration: none; font-weight: bold; }
     nav a:hover { text-decoration: underline; }
     .conteudo { padding: 30px; text-align: center; }
+    .botoes a {
+      display: inline-block;
+      margin: 10px;
+      padding: 15px 25px;
+      background: #2980b9;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .botoes a:hover {
+      background: #1c5980;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Bem-vindo à Gráfica Implotter</h1>
+    <h1>Área de Cadastros</h1>
   </header>
   <nav>
-    <a href="/cadastros">🧾 Cadastros</a>
-    <a href="#">💸 Vendas</a>
-    <a href="#">📋 Orçamentos</a>
-    <a href="#">📊 Financeiro</a>
+    <a href="/painel">🏠 Início</a>
     <a href="/produtos">📦 Produtos</a>
-    <a href="#">⚙️ Configurações</a>
+    <a href="/clientes">👥 Clientes</a>
+    <a href="#">🛠 Fornecedores</a>
+    <a href="#">📝 Serviços</a>
     <a href="/logout">🔓 Sair</a>
   </nav>
   <div class="conteudo">
-    <h2>Painel Principal</h2>
-    <p>Escolha uma opção no menu acima para começar.</p>
+    <h2>Escolha uma opção de cadastro</h2>
+    <div class="botoes">
+      <a href="/clientes">👥 Clientes</a>
+      <a href="/produtos">📦 Produtos</a>
+      <a href="#">🛠 Fornecedores</a>
+      <a href="#">📝 Serviços</a>
+    </div>
   </div>
 </body>
 </html>
