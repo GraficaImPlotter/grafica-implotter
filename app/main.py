@@ -39,6 +39,8 @@ async def painel(request: Request, usuario=Depends(get_usuario_logado)):
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
+        # ⚠️ Apaga todas as tabelas e recria do zero
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
     # Criação automática do admin
