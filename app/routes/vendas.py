@@ -11,7 +11,7 @@ from app.models.cliente import Cliente
 from app.models.produto import Produto
 from app.models.item_venda import ItemVenda
 
-from app.utils.comprovante_generator import gerar_comprovante
+from app.utils.comprovante_generator import gerar_comprovante_imagem
 
 router = APIRouter()
 
