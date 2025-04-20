@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form, Depends, HTTPException
+from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -13,14 +13,18 @@ from app.models.item_venda import ItemVenda
 
 router = APIRouter()
 
+
 @router.get("/vendas")
 async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Venda).order_by(Venda.data.desc()))
     vendas = result.scalars().all()
+    for venda in vendas:
+        await db.refresh(venda, attribute_names=["cliente"])  # Garante cliente na venda
     return request.app.state.templates.TemplateResponse("vendas.html", {
         "request": request,
         "vendas": vendas
     })
+
 
 @router.get("/vendas/nova")
 async def nova_venda(request: Request, db: AsyncSession = Depends(get_db)):
@@ -32,14 +36,15 @@ async def nova_venda(request: Request, db: AsyncSession = Depends(get_db)):
         "produtos": result_produtos.scalars().all()
     })
 
+
 @router.post("/vendas/nova")
 async def salvar_venda(
     request: Request,
     cliente_id: int = Form(...),
     forma_pagamento: str = Form(...),
-    desconto: float = Form(0.0),
     produto_id: list[int] = Form(...),
     quantidade: list[float] = Form(...),
+    desconto: float = Form(0),
     db: AsyncSession = Depends(get_db)
 ):
     total = 0
@@ -48,6 +53,7 @@ async def salvar_venda(
         produto = result.scalar_one_or_none()
         if produto:
             total += produto.preco_venda * qtd
+
     total -= desconto
 
     nova_venda = Venda(
@@ -65,53 +71,28 @@ async def salvar_venda(
     await db.commit()
     return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
 
-@router.get("/vendas/{venda_id}/editar")
+
+@router.get("/vendas/excluir/{venda_id}")
+async def excluir_venda(venda_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Venda).where(Venda.id == venda_id))
+    venda = result.scalar_one_or_none()
+    if venda:
+        await db.execute(ItemVenda.__table__.delete().where(ItemVenda.venda_id == venda_id))
+        await db.delete(venda)
+        await db.commit()
+    return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
+
+
+@router.get("/vendas/editar/{venda_id}")
 async def editar_venda(venda_id: int, request: Request, db: AsyncSession = Depends(get_db)):
     venda = await db.get(Venda, venda_id)
-    if not venda:
-        raise HTTPException(status_code=404, detail="Venda não encontrada")
-
-    clientes = (await db.execute(select(Cliente))).scalars().all()
-    produtos = (await db.execute(select(Produto))).scalars().all()
-    return request.app.state.templates.TemplateResponse("venda_editar.html", {
+    result_clientes = await db.execute(select(Cliente))
+    result_produtos = await db.execute(select(Produto))
+    itens = await db.execute(select(ItemVenda).where(ItemVenda.venda_id == venda_id))
+    return request.app.state.templates.TemplateResponse("venda_form.html", {
         "request": request,
         "venda": venda,
-        "clientes": clientes,
-        "produtos": produtos
+        "clientes": result_clientes.scalars().all(),
+        "produtos": result_produtos.scalars().all(),
+        "itens": itens.scalars().all()
     })
-
-@router.post("/vendas/{venda_id}/editar")
-async def atualizar_venda(
-    venda_id: int,
-    request: Request,
-    cliente_id: int = Form(...),
-    forma_pagamento: str = Form(...),
-    desconto: float = Form(0.0),
-    produto_id: list[int] = Form(...),
-    quantidade: list[float] = Form(...),
-    db: AsyncSession = Depends(get_db)
-):
-    venda = await db.get(Venda, venda_id)
-    if not venda:
-        raise HTTPException(status_code=404, detail="Venda não encontrada")
-
-    total = 0
-    for pid, qtd in zip(produto_id, quantidade):
-        result = await db.execute(select(Produto).where(Produto.id == pid))
-        produto = result.scalar_one_or_none()
-        if produto:
-            total += produto.preco_venda * qtd
-    total -= desconto
-
-    venda.cliente_id = cliente_id
-    venda.forma_pagamento = forma_pagamento
-    venda.total = total
-    venda.data = datetime.now()
-
-    await db.execute(ItemVenda.__table__.delete().where(ItemVenda.venda_id == venda_id))
-
-    for pid, qtd in zip(produto_id, quantidade):
-        db.add(ItemVenda(venda_id=venda_id, produto_id=pid, quantidade=qtd))
-
-    await db.commit()
-    return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)

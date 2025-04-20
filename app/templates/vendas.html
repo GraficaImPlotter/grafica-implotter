@@ -1,34 +1,62 @@
-{% extends "base.html" %}
-
-{% block conteudo %}
-<h1 class="titulo-pagina">Vendas Realizadas</h1>
-
-<a href="/vendas/nova" class="botao">Nova Venda</a>
-
-<table class="tabela">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Cliente</th>
-            <th>Data</th>
-            <th>Total</th>
-            <th>Forma de Pagamento</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for venda in vendas %}
-        <tr>
-            <td>{{ venda.id }}</td>
-            <td>{{ venda.cliente.nome }}</td>
-            <td>{{ venda.data.strftime('%d/%m/%Y %H:%M') }}</td>
-            <td>R$ {{ '%.2f'|format(venda.total or 0) }}</td>
-            <td>{{ venda.forma_pagamento }}</td>
-            <td>
-                <a href="/vendas/{{ venda.id }}/excluir" onclick="return confirm('Tem certeza que deseja excluir esta venda?')">Excluir</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Vendas | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .conteudo { padding: 30px; text-align: center; }
+    table { width: 90%; margin: auto; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    th { background: #2c3e50; color: white; }
+    a.botao { background: #2980b9; color: white; padding: 6px 10px; border-radius: 5px; text-decoration: none; }
+    a.botao:hover { background: #3498db; }
+    .topo { margin-bottom: 20px; display: flex; justify-content: center; gap: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Vendas</h1>
+  </header>
+  <nav>
+    <a href="/painel">🏠 Início</a>
+    <a href="/cadastros">🧾 Cadastros</a>
+    <a href="/clientes">👥 Clientes</a>
+    <a href="/produtos">📦 Produtos</a>
+    <a href="/vendas">💰 Vendas</a>
+    <a href="/logout">🔓 Sair</a>
+  </nav>
+  <div class="conteudo">
+    <div class="topo">
+      <a class="botao" href="/vendas/nova">➕ Nova Venda</a>
+    </div>
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Data</th>
+        <th>Valor Total</th>
+        <th>Pagamento</th>
+        <th>Ações</th>
+      </tr>
+      {% for venda in vendas %}
+      <tr>
+        <td>{{ venda.id }}</td>
+        <td>{{ venda.cliente.nome }}</td>
+        <td>{{ venda.data.strftime('%d/%m/%Y %H:%M') }}</td>
+        <td>R$ {{ '%.2f'|format(venda.total) }}</td>
+        <td>{{ venda.forma_pagamento }}</td>
+        <td>
+          <a class="botao" href="/vendas/editar/{{ venda.id }}">✏️ Editar</a>
+          <a class="botao" href="/vendas/excluir/{{ venda.id }}" onclick="return confirm('Tem certeza que deseja excluir esta venda?')">🗑️ Excluir</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</body>
+</html>
