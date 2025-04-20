@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Nova Venda</title>
+</head>
+<body>
+  <h1>Nova Venda</h1>
+  <form method="post">
+    <label>Cliente:</label>
+    <select name="cliente_id">
+      {% for cliente in clientes %}
+        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+      {% endfor %}
+    </select><br><br>
+
+    <label>Forma de Pagamento:</label>
+    <select name="forma_pagamento">
+      <option value="avista">À Vista</option>
+      <option value="prazo">A Prazo</option>
+    </select><br><br>
+
+    <label>Valor Total:</label>
+    <input type="number" step="0.01" name="valor_total"><br><br>
+
+    <label>Observação:</label>
+    <textarea name="observacao"></textarea><br><br>
+
+    <button type="submit">Finalizar Venda</button>
+  </form>
+  <br>
+  <a href="/painel">Voltar</a>
+</body>
+</html>
