@@ -9,30 +9,53 @@
     nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
     nav a { color: white; text-decoration: none; font-weight: bold; }
     nav a:hover { text-decoration: underline; }
-    .conteudo { padding: 30px; max-width: 800px; margin: auto; }
-    form { background: white; padding: 20px; border-radius: 8px; }
-    label { display: block; margin-top: 10px; font-weight: bold; }
-    input, select { width: 100%; padding: 8px; margin-top: 5px; }
-    .produtos { margin-top: 20px; }
-    .btn { background: #27ae60; color: white; border: none; padding: 10px 20px; cursor: pointer; margin-top: 20px; border-radius: 5px; }
-    .btn:hover { background: #1e8449; }
+    .conteudo { padding: 30px; }
+    h1 { text-align: center; color: #2c3e50; }
+    form { background: white; padding: 20px; border-radius: 8px; max-width: 700px; margin: 0 auto; }
+    label { display: block; margin-top: 10px; text-align: left; font-weight: bold; }
+    select, input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .itens { margin-top: 20px; }
+    .item { display: flex; gap: 10px; margin-bottom: 10px; }
+    .item select, .item input[type="number"] { flex: 1; }
+    button {
+      background: #2980b9;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #1c5980;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Editar Venda</h1>
+    <h1>Gráfica Implotter</h1>
   </header>
   <nav>
-    <a href="/painel">🏠 Início</a>
-    <a href="/produtos">📦 Produtos</a>
-    <a href="/clientes">👥 Clientes</a>
-    <a href="/vendas">🧾 Vendas</a>
-    <a href="/logout">🔓 Sair</a>
+    <a href="/painel">Início</a>
+    <a href="/clientes">Clientes</a>
+    <a href="/produtos">Produtos</a>
+    <a href="/vendas">Vendas</a>
+    <a href="/orcamentos">Orçamentos</a>
+    <a href="/logout">Sair</a>
   </nav>
+
   <div class="conteudo">
+    <h1>Editar Venda</h1>
     <form method="post">
-      <label for="cliente_id">Cliente</label>
-      <select name="cliente_id" required>
+      <label for="cliente_id">Cliente:</label>
+      <select name="cliente_id" id="cliente_id" required>
         {% for cliente in clientes %}
           <option value="{{ cliente.id }}" {% if cliente.id == venda.cliente_id %}selected{% endif %}>
             {{ cliente.nome }}
@@ -40,26 +63,29 @@
         {% endfor %}
       </select>
 
-      <label for="forma_pagamento">Forma de Pagamento</label>
-      <select name="forma_pagamento" required>
+      <label for="forma_pagamento">Forma de Pagamento:</label>
+      <select name="forma_pagamento" id="forma_pagamento" required>
         <option value="avista" {% if venda.forma_pagamento == 'avista' %}selected{% endif %}>À Vista</option>
         <option value="prazo" {% if venda.forma_pagamento == 'prazo' %}selected{% endif %}>A Prazo</option>
       </select>
 
-      <div class="produtos">
-        <h3>Produtos</h3>
-        {% for produto in produtos %}
-          <label>
-            <input type="checkbox" name="produto_id" value="{{ produto.id }}"
-              {% if produto.id in produto_ids %}checked{% endif %}>
-            {{ produto.nome }}
-          </label>
-          <input type="number" name="quantidade" placeholder="Quantidade" min="1"
-                 value="{{ quantidades[produto.id] if produto.id in quantidades else '' }}">
+      <div class="itens" id="itens">
+        <h3>Itens da Venda</h3>
+        {% for item in venda.itens %}
+          <div class="item">
+            <select name="produto_id">
+              {% for produto in produtos %}
+                <option value="{{ produto.id }}" {% if produto.id == item.produto_id %}selected{% endif %}>
+                  {{ produto.nome }}
+                </option>
+              {% endfor %}
+            </select>
+            <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1" required>
+          </div>
         {% endfor %}
       </div>
 
-      <button type="submit" class="btn">Salvar Alterações</button>
+      <button type="submit">Salvar Alterações</button>
     </form>
   </div>
 </body>

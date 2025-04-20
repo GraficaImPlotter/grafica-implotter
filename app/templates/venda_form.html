@@ -1,35 +1,86 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Nova Venda | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .conteudo { padding: 30px; }
+    h1 { text-align: center; color: #2c3e50; }
+    form { background: white; padding: 20px; border-radius: 8px; max-width: 700px; margin: 0 auto; }
+    label { display: block; margin-top: 10px; text-align: left; font-weight: bold; }
+    select, input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .itens { margin-top: 20px; }
+    .item { display: flex; gap: 10px; margin-bottom: 10px; }
+    .item select, .item input[type="number"] { flex: 1; }
+    button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #1e8449;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gráfica Implotter</h1>
+  </header>
+  <nav>
+    <a href="/painel">Início</a>
+    <a href="/clientes">Clientes</a>
+    <a href="/produtos">Produtos</a>
+    <a href="/vendas">Vendas</a>
+    <a href="/orcamentos">Orçamentos</a>
+    <a href="/logout">Sair</a>
+  </nav>
 
-{% block conteudo %}
-<h1 class="titulo-pagina">Nova Venda</h1>
+  <div class="conteudo">
+    <h1>Nova Venda</h1>
+    <form method="post">
+      <label for="cliente_id">Cliente:</label>
+      <select name="cliente_id" id="cliente_id" required>
+        {% for cliente in clientes %}
+          <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+        {% endfor %}
+      </select>
 
-<form method="post">
-  <label for="cliente_id">Cliente</label>
-  <select name="cliente_id" required>
-    {% for cliente in clientes %}
-      <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-    {% endfor %}
-  </select>
+      <label for="forma_pagamento">Forma de Pagamento:</label>
+      <select name="forma_pagamento" id="forma_pagamento" required>
+        <option value="avista">À Vista</option>
+        <option value="prazo">A Prazo</option>
+      </select>
 
-  <label for="forma_pagamento">Forma de Pagamento</label>
-  <select name="forma_pagamento" required>
-    <option value="avista">À Vista</option>
-    <option value="prazo">A Prazo</option>
-  </select>
-
-  <div class="produtos">
-    <h3>Produtos</h3>
-    {% for produto in produtos %}
-      <div class="grupo-produto">
-        <label>
-          <input type="checkbox" name="produto_id" value="{{ produto.id }}">
-          {{ produto.nome }}
-        </label>
-        <input type="number" name="quantidade" placeholder="Quantidade" min="1">
+      <div class="itens" id="itens">
+        <h3>Itens da Venda</h3>
+        <div class="item">
+          <select name="produto_id">
+            {% for produto in produtos %}
+              <option value="{{ produto.id }}">{{ produto.nome }}</option>
+            {% endfor %}
+          </select>
+          <input type="number" name="quantidade" placeholder="Quantidade" min="1" value="1" required>
+        </div>
       </div>
-    {% endfor %}
-  </div>
 
-  <button type="submit" class="btn-principal">Salvar Venda</button>
-</form>
-{% endblock %}
+      <button type="submit">Finalizar Venda</button>
+    </form>
+  </div>
+</body>
+</html>
