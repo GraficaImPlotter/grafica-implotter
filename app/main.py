@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 
 from app.database import engine, Base, get_db
 from app.auth.routes import router as auth_router
@@ -15,7 +15,7 @@ from app.initial_data.produtos import inserir_produtos_iniciais
 
 app = FastAPI()
 
-# Monta arquivos estáticos e público
+# Monta arquivos estáticos e públicos
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.mount("/public", StaticFiles(directory="public"), name="public")
 
@@ -37,7 +37,12 @@ app.add_middleware(
 async def pagina_principal():
     return FileResponse("public/index.html")
 
-# Inclui rotas
+# Painel após login
+@app.get("/painel", response_class=HTMLResponse)
+async def painel(request: Request, usuario=Depends(get_usuario_logado)):
+    return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
+
+# Inclui rotas de autenticação e cadastros
 app.include_router(auth_router)
 app.include_router(produtos_router)
 app.include_router(clientes_router)
