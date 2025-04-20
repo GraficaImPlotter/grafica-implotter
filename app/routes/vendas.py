@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from starlette.status import HTTP_303_SEE_OTHER
 from datetime import datetime
 
@@ -17,7 +18,9 @@ router = APIRouter()
 
 @router.get("/vendas")
 async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Venda).order_by(Venda.data.desc()))
+    result = await db.execute(
+        select(Venda).options(selectinload(Venda.cliente)).order_by(Venda.data.desc())
+    )
     vendas = result.scalars().all()
     return request.app.state.templates.TemplateResponse("vendas.html", {
         "request": request,
@@ -75,6 +78,6 @@ async def salvar_venda(
     await db.commit()
 
     cliente = await db.get(Cliente, cliente_id)
-    gerar_comprovante(nova_venda.id, nova_venda, cliente, itens_da_venda)
+    gerar_comprovante_imagem(nova_venda, cliente, itens_da_venda)
 
     return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
