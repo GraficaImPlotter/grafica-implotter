@@ -13,3 +13,8 @@ class Venda(Base):
 
     # Relacionamento com cliente
     cliente = relationship("Cliente", back_populates="vendas")
+
+from sqlalchemy.orm import relationship
+from app.models.item_venda import ItemVenda
+
+    itens = relationship("ItemVenda", back_populates="venda")
