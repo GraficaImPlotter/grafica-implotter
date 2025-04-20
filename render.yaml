@@ -1,11 +1,24 @@
+# Exported from Render on 2025-04-20T17:01:00Z
 services:
-  - type: web
-    name: grafica-implotter
-    env: docker
-    plan: free
-    repo: https://github.com/GraficaImPlotter/grafica-implotter
-    branch: main
-    dockerfilePath: Dockerfile
-    envVars:
-      - key: DATABASE_URL
-        value: postgresql://grafica_user:LJDHFaBekl1HpDUOaUxDbW00lN0Pgf9Y@dpg-d01orl3uibrs73b19lv0-a/grafica
+- type: web
+  name: grafica-implotter
+  runtime: docker
+  repo: https://github.com/GraficaImPlotter/grafica-implotter
+  plan: free
+  envVars:
+  - key: SECRET_KEY
+    sync: false
+  - key: DB_USER
+    sync: false
+  - key: DB_PORT
+    sync: false
+  - key: DB_PASSWORD
+    sync: false
+  - key: DB_NAME
+    sync: false
+  - key: DB_HOST
+    sync: false
+  region: oregon
+  dockerContext: .
+  dockerfilePath: ./Dockerfile
+version: "1"
