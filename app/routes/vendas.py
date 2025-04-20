@@ -37,29 +37,33 @@ async def salvar_venda(
     request: Request,
     cliente_id: int = Form(...),
     forma_pagamento: str = Form(...),
+    desconto: float = Form(0),
     produto_id: list[int] = Form(...),
-    quantidade: list[str] = Form(...),  # <- RECEBE COMO STRING E CONVERTE PARA FLOAT
+    quantidade: list[float] = Form(...),
     db: AsyncSession = Depends(get_db)
 ):
-    total = 0
-    quantidades_float = [float(q.replace(",", ".")) for q in quantidade]
-
-    for pid, qtd in zip(produto_id, quantidades_float):
+    # Calcular total bruto
+    total_bruto = 0
+    for pid, qtd in zip(produto_id, quantidade):
         result = await db.execute(select(Produto).where(Produto.id == pid))
         produto = result.scalar_one_or_none()
         if produto:
-            total += produto.preco_venda * qtd
+            total_bruto += produto.preco_venda * qtd
+
+    total_com_desconto = total_bruto - desconto
+    if total_com_desconto < 0:
+        total_com_desconto = 0
 
     nova_venda = Venda(
         cliente_id=cliente_id,
         data=datetime.now(),
         forma_pagamento=forma_pagamento,
-        total=round(total, 2)
+        total=total_com_desconto
     )
     db.add(nova_venda)
     await db.flush()
 
-    for pid, qtd in zip(produto_id, quantidades_float):
+    for pid, qtd in zip(produto_id, quantidade):
         db.add(ItemVenda(venda_id=nova_venda.id, produto_id=pid, quantidade=qtd))
 
     await db.commit()
