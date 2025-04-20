@@ -1,20 +1,50 @@
-<!-- app/templates/vendas.html -->
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Vendas | Gráfica Implotter</title>
-  <link rel="stylesheet" href="/static/estilo.css">
+    <meta charset="UTF-8">
+    <title>Vendas | Gráfica Implotter</title>
+    <style>
+        body { font-family: Arial; background: #f4f4f4; margin: 0; }
+        header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+        nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+        nav a { color: white; text-decoration: none; font-weight: bold; }
+        .conteudo { padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+        th { background: #2c3e50; color: white; }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Vendas</h1>
-    <a href="/painel">⬅️ Voltar</a>
-  </header>
-  <main>
-    <p>Esta é a página de Vendas.</p>
-    <p>Em breve você poderá registrar e visualizar vendas aqui!</p>
-  </main>
+<header>
+    <h1>Vendas Realizadas</h1>
+</header>
+<nav>
+    <a href="/painel">🏠 Início</a>
+    <a href="/vendas/nova">➕ Nova Venda</a>
+</nav>
+<div class="conteudo">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Forma Pagamento</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in vendas %}
+            <tr>
+                <td>{{ v.id }}</td>
+                <td>{{ v.cliente.nome }}</td>
+                <td>{{ v.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>R$ {{ '%.2f'|format(v.valor_total) }}</td>
+                <td>{{ v.forma_pagamento }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

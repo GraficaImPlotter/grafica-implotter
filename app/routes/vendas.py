@@ -7,9 +7,19 @@ from app.database import get_db
 from app.models.venda import Venda
 from app.models.cliente import Cliente
 from app.pdf.venda_pdf import gerar_comprovante_pdf
-from app.utils.mercadopago import gerar_pix
+
+from datetime import datetime
 
 router = APIRouter()
+
+@router.get("/vendas")
+async def listar_vendas(request: Request, usuario=Depends(get_usuario_logado), db: AsyncSession = Depends(get_db)):
+    vendas = (await db.execute(select(Venda))).scalars().all()
+    return request.app.state.templates.TemplateResponse("vendas.html", {
+        "request": request,
+        "usuario": usuario,
+        "vendas": vendas
+    })
 
 @router.get("/vendas/nova")
 async def nova_venda(request: Request, usuario=Depends(get_usuario_logado), db: AsyncSession = Depends(get_db)):
