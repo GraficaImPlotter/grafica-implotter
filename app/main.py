@@ -1,64 +1,36 @@
-from fastapi import FastAPI, Request, Depends
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-
-from app.database import engine, Base, get_db
-from app.auth.routes import router as auth_router
-from app.auth.dependencies import get_usuario_logado
-from app.routes.produtos import router as produtos_router
-from app.routes.clientes import router as clientes_router
+from fastapi.middleware.cors import CORSMiddleware
 from app.routes.vendas import router as vendas_router
-from app.routes.cadastros import router as cadastros_router
-from app.auth.models import Usuario
-from app.auth.utils import gerar_hash_senha
+from app.routes.clientes import router as clientes_router
+from app.routes.produtos import router as produtos_router
+from app.routes.usuarios import router as usuarios_router
+from app.database import create_tables
 from app.initial_data.produtos import inserir_produtos_iniciais
-from sqlalchemy.future import select
 
-# Templates do sistema
-templates = Jinja2Templates(directory="app/templates")
-
-# App FastAPI
 app = FastAPI()
 
-# Arquivos estáticos
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-app.mount("/public", StaticFiles(directory="public"), name="public")  # <- permite acessar imagens, css da home
+# Configura os templates do Jinja2
+templates = Jinja2Templates(directory="app/templates")
+app.state.templates = templates
 
-# Rota pública principal (index)
-@app.get("/", response_class=HTMLResponse)
-async def pagina_principal():
-    return FileResponse("public/index.html")
+# Habilita CORS se necessário
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Rotas internas do sistema
-app.include_router(auth_router)
-app.include_router(produtos_router)
-app.include_router(clientes_router)
+# Inclui as rotas
 app.include_router(vendas_router)
-app.include_router(cadastros_router)
+app.include_router(clientes_router)
+app.include_router(produtos_router)
+app.include_router(usuarios_router)
 
-# Painel após login
-@app.get("/painel", response_class=HTMLResponse)
-async def painel(request: Request, usuario=Depends(get_usuario_logado)):
-    return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
-
-# Execuções ao iniciar
+# Cria tabelas e dados iniciais no startup
 @app.on_event("startup")
 async def on_startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-    async for db in get_db():
-        resultado = await db.execute(select(Usuario).where(Usuario.email == "graficaimplotter@gmail.com"))
-        existe = resultado.scalar_one_or_none()
-        if not existe:
-            novo_admin = Usuario(
-                nome="Administrador",
-                email="graficaimplotter@gmail.com",
-                senha_hash=gerar_hash_senha("admin123"),
-                admin=True
-            )
-            db.add(novo_admin)
-            await db.commit()
-
+    await create_tables()
     await inserir_produtos_iniciais()
