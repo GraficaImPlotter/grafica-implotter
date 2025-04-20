@@ -38,34 +38,17 @@ async def salvar_venda(
     cliente_id: int = Form(...),
     forma_pagamento: str = Form(...),
     produto_id: list[int] = Form(...),
-    quantidade: list[str] = Form(...),
-    largura: list[str] = Form(...),
-    altura: list[str] = Form(...),
+    quantidade: list[str] = Form(...),  # <- RECEBE COMO STRING E CONVERTE PARA FLOAT
     db: AsyncSession = Depends(get_db)
 ):
     total = 0
+    quantidades_float = [float(q.replace(",", ".")) for q in quantidade]
 
-    for i, pid in enumerate(produto_id):
-        result = await db.execute(select(Produto).where(Produto.id == int(pid)))
+    for pid, qtd in zip(produto_id, quantidades_float):
+        result = await db.execute(select(Produto).where(Produto.id == pid))
         produto = result.scalar_one_or_none()
-
-        if not produto:
-            continue
-
-        if produto.unidade == "m²":
-            try:
-                largura_m = float(largura[i])
-                altura_m = float(altura[i])
-                area = largura_m * altura_m
-                total += produto.preco_venda * area
-            except:
-                pass
-        else:
-            try:
-                qtd = int(quantidade[i])
-                total += produto.preco_venda * qtd
-            except:
-                pass
+        if produto:
+            total += produto.preco_venda * qtd
 
     nova_venda = Venda(
         cliente_id=cliente_id,
@@ -76,23 +59,8 @@ async def salvar_venda(
     db.add(nova_venda)
     await db.flush()
 
-    for i, pid in enumerate(produto_id):
-        qtd_final = 0
-        result = await db.execute(select(Produto).where(Produto.id == int(pid)))
-        produto = result.scalar_one_or_none()
-
-        if produto.unidade == "m²":
-            try:
-                qtd_final = float(largura[i]) * float(altura[i])
-            except:
-                qtd_final = 0
-        else:
-            try:
-                qtd_final = int(quantidade[i])
-            except:
-                qtd_final = 0
-
-        db.add(ItemVenda(venda_id=nova_venda.id, produto_id=int(pid), quantidade=qtd_final))
+    for pid, qtd in zip(produto_id, quantidades_float):
+        db.add(ItemVenda(venda_id=nova_venda.id, produto_id=pid, quantidade=qtd))
 
     await db.commit()
     return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
