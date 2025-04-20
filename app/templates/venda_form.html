@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -9,13 +10,13 @@
     nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
     nav a { color: white; text-decoration: none; font-weight: bold; }
     nav a:hover { text-decoration: underline; }
-    .conteudo { padding: 30px; max-width: 800px; margin: auto; }
-    form { background: white; padding: 20px; border-radius: 8px; }
-    label { display: block; margin-top: 10px; font-weight: bold; }
-    input, select { width: 100%; padding: 8px; margin-top: 5px; }
-    .produtos { margin-top: 20px; }
-    .btn { background: #2980b9; color: white; border: none; padding: 10px 20px; cursor: pointer; margin-top: 20px; border-radius: 5px; }
-    .btn:hover { background: #1c5980; }
+    .conteudo { padding: 30px; }
+    .linha { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input, select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+    .btn { background: #27ae60; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; }
+    .btn:hover { background: #1e8449; }
+    .valor-total { font-size: 20px; margin-top: 20px; font-weight: bold; text-align: right; color: #2c3e50; }
   </style>
 </head>
 <body>
@@ -23,39 +24,93 @@
     <h1>Nova Venda</h1>
   </header>
   <nav>
-    <a href="/painel">🏠 Início</a>
-    <a href="/produtos">📦 Produtos</a>
-    <a href="/clientes">👥 Clientes</a>
-    <a href="/vendas">🧾 Vendas</a>
-    <a href="/logout">🔓 Sair</a>
+    <a href="/painel">Início</a>
+    <a href="/vendas">Vendas</a>
+    <a href="/clientes">Clientes</a>
+    <a href="/produtos">Produtos</a>
   </nav>
+
   <div class="conteudo">
-    <form method="post">
-      <label for="cliente_id">Cliente</label>
-      <select name="cliente_id" required>
-        {% for cliente in clientes %}
-          <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-        {% endfor %}
-      </select>
-
-      <label for="forma_pagamento">Forma de Pagamento</label>
-      <select name="forma_pagamento" required>
-        <option value="avista">À Vista</option>
-        <option value="prazo">A Prazo</option>
-      </select>
-
-      <div class="produtos">
-        <h3>Produtos</h3>
-        {% for produto in produtos %}
-          <label>
-            <input type="checkbox" name="produto_id" value="{{ produto.id }}"> {{ produto.nome }}
-          </label>
-          <input type="number" name="quantidade" placeholder="Quantidade" min="1">
-        {% endfor %}
+    <form method="post" action="/vendas/nova" id="form-venda">
+      <div class="linha">
+        <label for="cliente_id">Cliente:</label>
+        <select name="cliente_id" required>
+          <option value="">Selecione um cliente</option>
+          {% for cliente in clientes %}
+            <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+          {% endfor %}
+        </select>
       </div>
 
-      <button type="submit" class="btn">Salvar Venda</button>
+      <div class="linha">
+        <label for="forma_pagamento">Forma de Pagamento:</label>
+        <select name="forma_pagamento" required>
+          <option value="avista">À Vista</option>
+          <option value="aprazo">A Prazo</option>
+        </select>
+      </div>
+
+      <div id="itens-venda">
+        <div class="linha">
+          <label>Produto:</label>
+          <select name="produto_id" class="produto">
+            {% for produto in produtos %}
+              <option value="{{ produto.id }}" data-preco="{{ produto.preco_venda }}">{{ produto.nome }}</option>
+            {% endfor %}
+          </select>
+          <label>Quantidade:</label>
+          <input type="number" name="quantidade" class="quantidade" step="0.01" required>
+        </div>
+      </div>
+
+      <button type="button" class="btn" onclick="adicionarProduto()">+ Adicionar Produto</button>
+
+      <div class="linha">
+        <label for="desconto">Desconto (R$):</label>
+        <input type="number" name="desconto" id="desconto" step="0.01" value="0">
+      </div>
+
+      <div class="valor-total">Total: R$ <span id="valor-total">0.00</span></div>
+
+      <button type="submit" class="btn">Finalizar Venda</button>
     </form>
   </div>
+
+  <script>
+    function adicionarProduto() {
+      const container = document.getElementById("itens-venda");
+      const novaLinha = document.createElement("div");
+      novaLinha.classList.add("linha");
+      novaLinha.innerHTML = `
+        <label>Produto:</label>
+        <select name="produto_id" class="produto">
+          {% for produto in produtos %}
+            <option value="{{ produto.id }}" data-preco="{{ produto.preco_venda }}">{{ produto.nome }}</option>
+          {% endfor %}
+        </select>
+        <label>Quantidade:</label>
+        <input type="number" name="quantidade" class="quantidade" step="0.01" required>
+      `;
+      container.appendChild(novaLinha);
+    }
+
+    document.addEventListener("input", calcularTotal);
+    function calcularTotal() {
+      const produtos = document.querySelectorAll(".produto");
+      const quantidades = document.querySelectorAll(".quantidade");
+      let total = 0;
+
+      produtos.forEach((select, i) => {
+        const preco = parseFloat(select.selectedOptions[0].dataset.preco || 0);
+        const qtd = parseFloat(quantidades[i].value || 0);
+        total += preco * qtd;
+      });
+
+      const desconto = parseFloat(document.getElementById("desconto").value || 0);
+      total -= desconto;
+
+      document.getElementById("valor-total").innerText = total.toFixed(2);
+    }
+  </script>
 </body>
 </html>

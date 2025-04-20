@@ -2,7 +2,6 @@ from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
 from starlette.status import HTTP_303_SEE_OTHER
 from datetime import datetime
 
@@ -18,9 +17,7 @@ router = APIRouter()
 
 @router.get("/vendas")
 async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(Venda).options(selectinload(Venda.cliente)).order_by(Venda.data.desc())
-    )
+    result = await db.execute(select(Venda).order_by(Venda.data.desc()))
     vendas = result.scalars().all()
     return request.app.state.templates.TemplateResponse("vendas.html", {
         "request": request,
@@ -44,13 +41,16 @@ async def salvar_venda(
     forma_pagamento: str = Form(...),
     desconto: float = Form(0),
     produto_id: list[int] = Form(...),
-    quantidade: list[float] = Form(...),
+    quantidade: list[str] = Form(...),
     db: AsyncSession = Depends(get_db)
 ):
     total = 0
     itens_da_venda = []
 
-    for pid, qtd in zip(produto_id, quantidade):
+    for pid, qtd_str in zip(produto_id, quantidade):
+        if not qtd_str.strip():
+            continue
+        qtd = float(qtd_str)
         produto = await db.get(Produto, pid)
         if produto:
             subtotal = produto.preco_venda * qtd
