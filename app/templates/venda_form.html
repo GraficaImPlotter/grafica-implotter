@@ -2,69 +2,50 @@
 
 {% block conteudo %}
 <h1 class="titulo-pagina">Nova Venda</h1>
+
 <form method="post" action="/vendas/nova">
-    <label for="cliente_id">Cliente:</label>
-    <select name="cliente_id" required>
-        {% for cliente in clientes %}
-        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-        {% endfor %}
-    </select>
+    <div class="form-grupo">
+        <label for="cliente_id">Cliente:</label>
+        <select name="cliente_id" required>
+            {% for cliente in clientes %}
+                <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
-    <label for="forma_pagamento">Forma de Pagamento:</label>
-    <select name="forma_pagamento" required>
-        <option value="avista">À vista</option>
-        <option value="aprazo">A prazo</option>
-    </select>
-
-    <div id="itens-venda">
-        <h3>Produtos</h3>
-        <div class="item-venda">
-            <select name="produto_id" class="produto-select" required>
-                <option value="">Selecione um produto</option>
+    <div id="itens-container">
+        <div class="form-grupo item-venda">
+            <label>Produto:</label>
+            <select name="produto_id">
                 {% for produto in produtos %}
-                <option value="{{ produto.id }}" data-unidade="{{ produto.unidade }}">{{ produto.nome }}</option>
+                    <option value="{{ produto.id }}" data-unidade="{{ produto.unidade }}">{{ produto.nome }}</option>
                 {% endfor %}
             </select>
 
-            <input type="number" name="quantidade" placeholder="Quantidade" min="1" step="1" class="campo-quantidade" required>
-
-            <input type="number" step="0.01" min="0.01" name="largura" placeholder="Largura (m)" class="campo-area" style="display:none;">
-            <input type="number" step="0.01" min="0.01" name="altura" placeholder="Altura (m)" class="campo-area" style="display:none;">
+            <label>Quantidade:</label>
+            <input type="text" name="quantidade" placeholder="Ex: 1 ou 0.5 ou 32x120">
         </div>
     </div>
 
-    <button type="button" onclick="adicionarProduto()">Adicionar Produto</button>
+    <button type="button" onclick="adicionarItem()">+ Adicionar Produto</button>
+    <br><br>
+
+    <label>Forma de Pagamento:</label>
+    <select name="forma_pagamento" required>
+        <option value="avista">À Vista</option>
+        <option value="prazo">A Prazo</option>
+    </select>
+
     <br><br>
     <button type="submit">Finalizar Venda</button>
 </form>
 
 <script>
-function adicionarProduto() {
-    const item = document.querySelector(".item-venda");
-    const clone = item.cloneNode(true);
-    document.getElementById("itens-venda").appendChild(clone);
-}
-
-document.addEventListener("change", function (e) {
-    if (e.target.classList.contains("produto-select")) {
-        const unidade = e.target.selectedOptions[0].dataset.unidade;
-        const container = e.target.closest(".item-venda");
-        const campoQtd = container.querySelector(".campo-quantidade");
-        const camposArea = container.querySelectorAll(".campo-area");
-
-        if (unidade === "m²") {
-            campoQtd.style.display = "none";
-            campoQtd.value = "";
-            camposArea.forEach(campo => campo.style.display = "inline");
-        } else {
-            campoQtd.style.display = "inline";
-            campoQtd.value = 1;
-            camposArea.forEach(campo => {
-                campo.style.display = "none";
-                campo.value = "";
-            });
-        }
+    function adicionarItem() {
+        const container = document.getElementById('itens-container');
+        const item = document.querySelector('.item-venda');
+        const novoItem = item.cloneNode(true);
+        container.appendChild(novoItem);
     }
-});
 </script>
 {% endblock %}
