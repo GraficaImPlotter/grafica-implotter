@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models.produto import Produto
 from starlette.responses import RedirectResponse
 
-from app.auth.auth import get_current_user
+from app.auth import get_current_user
 from fastapi.templating import Jinja2Templates
 
 templates = Jinja2Templates(directory="app/templates")
