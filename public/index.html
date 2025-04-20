@@ -1,68 +1,195 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gráfica Implotter</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #001F3F;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header img {
+      height: 50px;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 10px 20px;
+      background: #FF4136;
+      border-radius: 6px;
+    }
+
+    .banner {
+      background: url('/static/banner.jpg') center/cover no-repeat;
+      height: 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      flex-direction: column;
+    }
+
+    .banner h1 {
+      font-size: 36px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+
+    .vitrine {
+      padding: 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 30px;
+    }
+
+    .produto {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .produto img {
+      width: 100%;
+      border-radius: 8px;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .produto h3 {
+      margin: 15px 0 5px;
+      font-size: 18px;
+      color: #001F3F;
+    }
+
+    .produto a {
+      display: inline-block;
+      margin-top: 10px;
+      background: #0074D9;
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+    }
+
+    .destaque {
+      background: #0074D9;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .destaque h2 {
+      margin-bottom: 10px;
+    }
+
+    .orcamento {
+      background: #FF4136;
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .orcamento a {
+      background: white;
+      color: #FF4136;
+      padding: 15px 25px;
+      font-weight: bold;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    footer {
+      background: #001F3F;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 15px;
+    }
+
+    footer a {
+      color: #FFDC00;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
+
   <header>
-    <img src="logo.png" alt="Logo Gráfica Implotter">
-    <a href="/login" class="login-btn">Login</a>
+    <img src="/static/logo.png" alt="Gráfica Implotter">
+    <a href="/login" class="login-button">🔐 Login</a>
   </header>
 
-  <main>
-    <section class="banner">
-      <h1>Transforme sua ideia em realidade com a Gráfica Implotter</h1>
-      <p>Alta qualidade e agilidade em serviços gráficos personalizados</p>
-      <a href="#orcamento" class="btn-banner">Solicitar Orçamento</a>
-    </section>
+  <section class="banner">
+    <h1>Gráfica Implotter</h1>
+    <p>Seu parceiro gráfico de confiança</p>
+  </section>
 
-    <section class="produtos">
-      <h2>Produtos em Destaque</h2>
-      <div class="vitrine">
-        <div class="item">
-          <img src="https://via.placeholder.com/300x200?text=Cartões+de+Visita">
-          <h3>Cartões de Visita</h3>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x200?text=Panfletos">
-          <h3>Panfletos</h3>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x200?text=Banner">
-          <h3>Banner</h3>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x200?text=Windbanner">
-          <h3>Windbanner</h3>
-        </div>
-      </div>
-    </section>
+  <section class="destaque">
+    <h2>Destaques e Promoções</h2>
+    <p>Confira nossas ofertas especiais e produtos mais procurados!</p>
+  </section>
 
-    <section class="orcamento" id="orcamento">
-      <h2>Solicite um Orçamento</h2>
-      <form>
-        <input type="text" placeholder="Seu nome" required>
-        <input type="email" placeholder="Seu e-mail" required>
-        <textarea placeholder="Descreva sua necessidade"></textarea>
-        <button type="submit">Enviar</button>
-      </form>
-    </section>
+  <section class="vitrine">
+    <div class="produto">
+      <img src="/static/cartao.jpg" alt="Cartões de Visita">
+      <h3>Cartões de Visita</h3>
+      <a href="https://wa.me/5533991449635" target="_blank">Pedir via WhatsApp</a>
+    </div>
 
-    <section class="contato">
-      <h2>Atendimento</h2>
-      <p>Atendemos todo o Brasil</p>
-      <p>Horário: Segunda a Sexta, de 08h às 18h</p>
-    </section>
-  </main>
+    <div class="produto">
+      <img src="/static/panfleto.jpg" alt="Panfletos">
+      <h3>Panfletos</h3>
+      <a href="https://wa.me/5533991449635" target="_blank">Pedir via WhatsApp</a>
+    </div>
+
+    <div class="produto">
+      <img src="/static/banner.jpg" alt="Banners">
+      <h3>Banners</h3>
+      <a href="https://wa.me/5533991449635" target="_blank">Pedir via WhatsApp</a>
+    </div>
+
+    <div class="produto">
+      <img src="/static/windbanner.jpg" alt="Wind Banner">
+      <h3>Wind Banner</h3>
+      <a href="https://wa.me/5533991449635" target="_blank">Pedir via WhatsApp</a>
+    </div>
+  </section>
+
+  <section class="orcamento">
+    <h2>Quer um orçamento rápido?</h2>
+    <a href="https://wa.me/5533991449635" target="_blank">Chamar no WhatsApp</a>
+  </section>
 
   <footer>
-    <p>📱 <a href="https://wa.me/5533991449635" target="_blank">(33) 99144-9635</a> |
-       📸 <a href="https://instagram.com/grafica.implotter" target="_blank">@grafica.implotter</a></p>
-    <p>&copy; 2025 Gráfica Implotter</p>
+    <p>📞 WhatsApp: <a href="https://wa.me/5533991449635" target="_blank">(33) 99144-9635</a> |
+       📸 Instagram: <a href="https://instagram.com/grafica.implotter" target="_blank">@grafica.implotter</a></p>
+    <p>© 2025 Gráfica Implotter - Todos os direitos reservados</p>
   </footer>
+
 </body>
 </html>

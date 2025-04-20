@@ -13,36 +13,36 @@ from app.routes.cadastros import router as cadastros_router
 from app.auth.models import Usuario
 from app.auth.utils import gerar_hash_senha
 from app.initial_data.produtos import inserir_produtos_iniciais
-
 from sqlalchemy.future import select
-
-app = FastAPI()
 
 # Templates do sistema
 templates = Jinja2Templates(directory="app/templates")
 
-# Arquivos estáticos (para sistema e para site público)
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-app.mount("/site", StaticFiles(directory="public"), name="site")  # para carregar CSS/imagens do site público
+# App FastAPI
+app = FastAPI()
 
-# Rotas do sistema
+# Arquivos estáticos
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/public", StaticFiles(directory="public"), name="public")  # <- permite acessar imagens, css da home
+
+# Rota pública principal (index)
+@app.get("/", response_class=HTMLResponse)
+async def pagina_principal():
+    return FileResponse("public/index.html")
+
+# Rotas internas do sistema
 app.include_router(auth_router)
 app.include_router(produtos_router)
 app.include_router(clientes_router)
 app.include_router(vendas_router)
 app.include_router(cadastros_router)
 
-# Página principal pública (index.html na raiz/public)
-@app.get("/", response_class=HTMLResponse)
-async def pagina_publica():
-    return FileResponse("public/index.html")
-
 # Painel após login
 @app.get("/painel", response_class=HTMLResponse)
 async def painel(request: Request, usuario=Depends(get_usuario_logado)):
     return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
 
-# Ao iniciar o app
+# Execuções ao iniciar
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
