@@ -1,9 +1,9 @@
-
 from fastapi import Request, APIRouter, Depends, Form
 from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from datetime import datetime
+from fastapi.templating import Jinja2Templates
 
 from app.database import get_db
 from app.auth.dependencies import get_usuario_logado
@@ -13,9 +13,16 @@ from app.pdf.venda_pdf import gerar_comprovante_pdf
 from app.utils.mercadopago import gerar_pix
 
 router = APIRouter()
+templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/vendas", response_class=HTMLResponse)
-async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db), usuario=Depends(get_usuario_logado), data_inicial: str = None, data_final: str = None):
+async def listar_vendas(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    usuario=Depends(get_usuario_logado),
+    data_inicial: str = None,
+    data_final: str = None
+):
     query = select(Venda)
 
     if data_inicial:
@@ -27,12 +34,20 @@ async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db), us
         query = query.where(Venda.data <= data_final)
 
     vendas = (await db.execute(query)).scalars().all()
-    return request.app.state.templates.TemplateResponse("vendas.html", {"request": request, "vendas": vendas, "usuario": usuario})
+    return templates.TemplateResponse("vendas.html", {
+        "request": request,
+        "vendas": vendas,
+        "usuario": usuario
+    })
 
 @router.get("/vendas/nova")
-async def nova_venda(request: Request, usuario=Depends(get_usuario_logado), db: AsyncSession = Depends(get_db)):
+async def nova_venda(
+    request: Request,
+    usuario=Depends(get_usuario_logado),
+    db: AsyncSession = Depends(get_db)
+):
     clientes = (await db.execute(select(Cliente))).scalars().all()
-    return request.app.state.templates.TemplateResponse("venda_form.html", {
+    return templates.TemplateResponse("venda_form.html", {
         "request": request,
         "usuario": usuario,
         "clientes": clientes
