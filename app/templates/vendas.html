@@ -2,26 +2,51 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Vendas | Gráfica Implotter</title>
+    <meta charset="UTF-8">
+    <title>Vendas | Gráfica Implotter</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: #fff; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #34495e; color: white; }
+        a.botao { display: inline-block; margin-bottom: 20px; padding: 10px 15px; background-color: #2ecc71; color: white; text-decoration: none; border-radius: 5px; }
+        form { margin-bottom: 20px; }
+    </style>
 </head>
 <body>
-  <h1>Lista de Vendas</h1>
+    <h2>Vendas Realizadas</h2>
 
-  <form method="get" action="/vendas">
-    <label>Data Inicial:</label>
-    <input type="date" name="data_inicial">
-    <label>Data Final:</label>
-    <input type="date" name="data_final">
-    <button type="submit">Filtrar</button>
-  </form>
+    <a href="/vendas/nova" class="botao">➕ Nova Venda</a>
 
-  <ul>
-    {% for venda in vendas %}
-      <li>
-        {{ venda.data.strftime("%d/%m/%Y") }} - R$ {{ venda.total }} - {{ venda.forma_pagamento }} - {{ venda.cliente.nome }}
-      </li>
-    {% endfor %}
-  </ul>
+    <form method="get">
+        <label for="data_inicial">Data Inicial:</label>
+        <input type="date" name="data_inicial" id="data_inicial">
+        <label for="data_final">Data Final:</label>
+        <input type="date" name="data_final" id="data_final">
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Pagamento</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venda in vendas %}
+            <tr>
+                <td>{{ venda.id }}</td>
+                <td>{{ venda.cliente.nome }}</td>
+                <td>{{ venda.data.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>R$ {{ '%.2f'|format(venda.total) }}</td>
+                <td>{{ venda.forma_pagamento }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
