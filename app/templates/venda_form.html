@@ -9,69 +9,52 @@
     nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
     nav a { color: white; text-decoration: none; font-weight: bold; }
     nav a:hover { text-decoration: underline; }
-    .conteudo { padding: 30px; }
-    h1 { text-align: center; color: #2c3e50; }
-    form { background: white; padding: 20px; border-radius: 10px; max-width: 700px; margin: auto; }
+    .conteudo { padding: 30px; max-width: 800px; margin: auto; }
+    form { background: white; padding: 20px; border-radius: 8px; }
     label { display: block; margin-top: 10px; font-weight: bold; }
-    input, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
-    .btn-salvar {
-      margin-top: 20px;
-      padding: 12px 20px;
-      background: #27ae60;
-      color: white;
-      font-weight: bold;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .btn-salvar:hover {
-      background: #1e874b;
-    }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; }
+    .produtos { margin-top: 20px; }
+    .btn { background: #2980b9; color: white; border: none; padding: 10px 20px; cursor: pointer; margin-top: 20px; border-radius: 5px; }
+    .btn:hover { background: #1c5980; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Gráfica Implotter</h1>
+    <h1>Nova Venda</h1>
   </header>
   <nav>
-    <a href="/painel">Painel</a>
-    <a href="/clientes">Clientes</a>
-    <a href="/produtos">Produtos</a>
-    <a href="/vendas">Vendas</a>
-    <a href="/orcamentos">Orçamentos</a>
-    <a href="/logout">Sair</a>
+    <a href="/painel">🏠 Início</a>
+    <a href="/produtos">📦 Produtos</a>
+    <a href="/clientes">👥 Clientes</a>
+    <a href="/vendas">🧾 Vendas</a>
+    <a href="/logout">🔓 Sair</a>
   </nav>
   <div class="conteudo">
-    <h1>Nova Venda</h1>
-    <form method="post" action="/vendas/nova">
-      <label>Cliente:</label>
+    <form method="post">
+      <label for="cliente_id">Cliente</label>
       <select name="cliente_id" required>
         {% for cliente in clientes %}
           <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
         {% endfor %}
       </select>
 
-      <label>Forma de Pagamento:</label>
+      <label for="forma_pagamento">Forma de Pagamento</label>
       <select name="forma_pagamento" required>
         <option value="avista">À Vista</option>
         <option value="prazo">A Prazo</option>
       </select>
 
-      <label>Desconto (opcional):</label>
-      <input type="number" step="0.01" name="desconto" placeholder="Ex: 10.00">
-
-      <label>Produtos:</label>
-      {% for produto in produtos %}
-        <div style="margin-bottom: 10px; background: #ecf0f1; padding: 10px; border-radius: 5px;">
+      <div class="produtos">
+        <h3>Produtos</h3>
+        {% for produto in produtos %}
           <label>
             <input type="checkbox" name="produto_id" value="{{ produto.id }}"> {{ produto.nome }}
           </label>
-          <label>Quantidade ({{ produto.unidade or 'unidade' }}):</label>
-          <input type="number" step="0.01" name="quantidade" placeholder="Ex: 1.00">
-        </div>
-      {% endfor %}
+          <input type="number" name="quantidade" placeholder="Quantidade" min="1">
+        {% endfor %}
+      </div>
 
-      <button class="btn-salvar" type="submit">Finalizar Venda</button>
+      <button type="submit" class="btn">Salvar Venda</button>
     </form>
   </div>
 </body>

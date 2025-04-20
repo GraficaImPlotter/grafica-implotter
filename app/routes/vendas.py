@@ -2,7 +2,6 @@ from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
 from starlette.status import HTTP_303_SEE_OTHER
 from datetime import datetime
 
@@ -12,21 +11,13 @@ from app.models.cliente import Cliente
 from app.models.produto import Produto
 from app.models.item_venda import ItemVenda
 
-from app.utils.mercadopago import gerar_pix
-from app.utils.comprovante_generator import gerar_comprovante_imagem
+from app.utils.comprovante_generator import gerar_comprovante
 
 router = APIRouter()
 
 @router.get("/vendas")
 async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(Venda)
-        .options(
-            selectinload(Venda.cliente),
-            selectinload(Venda.itens).selectinload(ItemVenda.produto)
-        )
-        .order_by(Venda.data.desc())
-    )
+    result = await db.execute(select(Venda).order_by(Venda.data.desc()))
     vendas = result.scalars().all()
     return request.app.state.templates.TemplateResponse("vendas.html", {
         "request": request,
@@ -51,51 +42,39 @@ async def salvar_venda(
     desconto: float = Form(0),
     produto_id: list[int] = Form(...),
     quantidade: list[float] = Form(...),
-    largura: list[float] = Form(...),
-    altura: list[float] = Form(...),
     db: AsyncSession = Depends(get_db)
 ):
     total = 0
-    for i in range(len(produto_id)):
-        result = await db.execute(select(Produto).where(Produto.id == produto_id[i]))
-        produto = result.scalar_one_or_none()
-        if produto:
-            if produto.unidade == "m²":
-                m2 = (largura[i] * altura[i]) / 10000
-                total += produto.preco_venda * m2
-            else:
-                total += produto.preco_venda * quantidade[i]
+    itens_da_venda = []
 
-    total_com_desconto = total - desconto
+    for pid, qtd in zip(produto_id, quantidade):
+        produto = await db.get(Produto, pid)
+        if produto:
+            subtotal = produto.preco_venda * qtd
+            total += subtotal
+            itens_da_venda.append({"produto": produto, "quantidade": qtd})
+
+    total_final = total - desconto
 
     nova_venda = Venda(
         cliente_id=cliente_id,
         data=datetime.now(),
         forma_pagamento=forma_pagamento,
-        total=total_com_desconto
+        total=total_final
     )
     db.add(nova_venda)
     await db.flush()
 
-    for i in range(len(produto_id)):
-        qtd = quantidade[i]
-        result = await db.execute(select(Produto).where(Produto.id == produto_id[i]))
-        produto = result.scalar_one_or_none()
-        if produto:
-            if produto.unidade == "m²":
-                qtd = (largura[i] * altura[i]) / 10000
-            db.add(ItemVenda(venda_id=nova_venda.id, produto_id=produto_id[i], quantidade=qtd))
+    for item in itens_da_venda:
+        db.add(ItemVenda(
+            venda_id=nova_venda.id,
+            produto_id=item["produto"].id,
+            quantidade=item["quantidade"]
+        ))
 
     await db.commit()
 
-    # Gerar PIX e comprovante
-    payload = {
-        "transaction_amount": float(total_com_desconto),
-        "description": f"Venda #{nova_venda.id} na Gráfica Implotter",
-        "payer_email": "seu-email@exemplo.com",
-        "payer_name": "Cliente",
-    }
-    pix = gerar_pix(payload)
-    gerar_comprovante(nova_venda.id, total_com_desconto, forma_pagamento)
+    cliente = await db.get(Cliente, cliente_id)
+    gerar_comprovante(nova_venda.id, nova_venda, cliente, itens_da_venda)
 
     return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
