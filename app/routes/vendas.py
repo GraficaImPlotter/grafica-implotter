@@ -6,7 +6,10 @@ from starlette.status import HTTP_303_SEE_OTHER
 from datetime import datetime
 
 from app.database import get_db
-from app.models import Venda, Cliente, Produto, ItemVenda
+from app.models.venda import Venda
+from app.models.cliente import Cliente
+from app.models.produto import Produto
+from app.models.item_venda import ItemVenda
 
 router = APIRouter()
 
