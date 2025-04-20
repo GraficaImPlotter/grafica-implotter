@@ -16,14 +16,15 @@ from app.initial_data.produtos import inserir_produtos_iniciais
 
 from sqlalchemy.future import select
 
-templates = Jinja2Templates(directory="app/templates")
-@app.get("/", response_class=HTMLResponse)
-async def pagina_publica(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
 app = FastAPI()
+
+# Templates
+templates = Jinja2Templates(directory="app/templates")
+
+# Arquivos estáticos
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
+# Rotas
 app.include_router(auth_router)
 app.include_router(produtos_router)
 app.include_router(clientes_router)
@@ -40,6 +41,7 @@ async def pagina_publica(request: Request):
 async def painel(request: Request, usuario=Depends(get_usuario_logado)):
     return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
 
+# Evento ao iniciar o app
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
