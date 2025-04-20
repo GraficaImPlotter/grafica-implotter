@@ -1,34 +1,27 @@
 {% extends "base.html" %}
 
 {% block conteudo %}
-<div class="container">
-    <h1 class="titulo-pagina">📦 Produtos</h1>
-
-    {% if produtos %}
-    <table class="tabela">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Descrição</th>
-                <th>Valor de Compra</th>
-                <th>Preço de Venda</th>
-                <th>Unidade</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for produto in produtos %}
-            <tr>
-                <td>{{ produto.nome or '-' }}</td>
-                <td>{{ produto.descricao or '-' }}</td>
-                <td>R$ {{ '%.2f'|format(produto.valor_compra or 0) }}</td>
-                <td>R$ {{ '%.2f'|format(produto.preco_venda or 0) }}</td>
-                <td>{{ produto.unidade or '-' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Nenhum produto cadastrado.</p>
-    {% endif %}
-</div>
+<h1 class="titulo-pagina">Produtos</h1>
+<table class="tabela">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Valor de Compra</th>
+            <th>Preço de Venda</th>
+            <th>Unidade</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for produto in produtos %}
+        <tr>
+            <td>{{ produto.nome }}</td>
+            <td>{{ produto.descricao or "-" }}</td>
+            <td>R$ {{ '%.2f'|format(produto.valor_compra or 0) }}</td>
+            <td>R$ {{ '%.2f'|format(produto.preco_venda or 0) }}</td>
+            <td>{{ produto.unidade or "-" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
