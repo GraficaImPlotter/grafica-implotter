@@ -17,7 +17,9 @@ router = APIRouter()
 @router.get("/vendas")
 async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(Venda).options(selectinload(Venda.cliente)).order_by(Venda.data.desc())
+        select(Venda)
+        .options(selectinload(Venda.cliente))
+        .order_by(Venda.data.desc())
     )
     vendas = result.scalars().all()
     return request.app.state.templates.TemplateResponse("vendas.html", {
@@ -42,40 +44,28 @@ async def salvar_venda(
     forma_pagamento: str = Form(...),
     desconto: float = Form(0.0),
     produto_id: list[int] = Form(...),
-    quantidade: list[int] = Form(...),
-    largura: list[float] = Form(None),
-    altura: list[float] = Form(None),
+    quantidade: list[float] = Form(...),
     db: AsyncSession = Depends(get_db)
 ):
     total = 0
-    for i, (pid, qtd) in enumerate(zip(produto_id, quantidade)):
+    for pid, qtd in zip(produto_id, quantidade):
         result = await db.execute(select(Produto).where(Produto.id == pid))
         produto = result.scalar_one_or_none()
         if produto:
-            if produto.unidade == "m²" and largura and altura and largura[i] and altura[i]:
-                area = (largura[i] * altura[i]) / 10000  # converte cm² para m²
-                total += produto.preco_venda * area
-                qtd = area  # registra a metragem
-            else:
-                total += produto.preco_venda * qtd
+            total += produto.preco_venda * qtd
 
-    total_com_desconto = total - desconto
+    total_final = total - desconto
 
     nova_venda = Venda(
         cliente_id=cliente_id,
         data=datetime.now(),
         forma_pagamento=forma_pagamento,
-        total=total_com_desconto
+        total=total_final
     )
     db.add(nova_venda)
-    await db.flush()  # pega o ID da venda
+    await db.flush()
 
-    for i, (pid, qtd) in enumerate(zip(produto_id, quantidade)):
-        if largura and altura and largura[i] and altura[i]:
-            result = await db.execute(select(Produto).where(Produto.id == pid))
-            produto = result.scalar_one_or_none()
-            if produto and produto.unidade == "m²":
-                qtd = (largura[i] * altura[i]) / 10000
+    for pid, qtd in zip(produto_id, quantidade):
         db.add(ItemVenda(venda_id=nova_venda.id, produto_id=pid, quantidade=qtd))
 
     await db.commit()
