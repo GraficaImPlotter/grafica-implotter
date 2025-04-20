@@ -1,42 +1,88 @@
-<h1>Nova Venda</h1>
-<form method="post">
-  <label>Cliente:</label>
-  <select name="cliente_id">
-    {% for cliente in clientes %}
-      <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-    {% endfor %}
-  </select><br><br>
-
-  <div id="produtos-container">
-    <div class="produto-item">
-      <label>Produto:</label>
-      <select name="produto_id[]">
-        {% for produto in produtos %}
-          <option value="{{ produto.id }}">{{ produto.nome }}</option>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Nova Venda | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+    .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    select, input[type="number"], textarea, input[readonly] { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; }
+    #produtos-container .produto-item { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+    #produtos-container .produto-item select { flex: 2; }
+    #produtos-container .produto-item input { flex: 1; }
+    .botao, button { display: inline-block; margin-top: 20px; padding: 10px 15px; background-color: #2ecc71; color: white; text-decoration: none; border: none; border-radius: 5px; cursor: pointer; }
+    .botao:hover, button:hover { background-color: #27ae60; }
+    #valor-total { font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Nova Venda</h2>
+    <form method="post">
+      <label>Cliente:</label>
+      <select name="cliente_id" required>
+        {% for cliente in clientes %}
+          <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
         {% endfor %}
       </select>
-      <label>Quantidade:</label>
-      <input type="number" name="quantidade[]" min="1" value="1">
-    </div>
+
+      <div id="produtos-container">
+        <div class="produto-item">
+          <select name="produto_id" class="produto-selecionado" required>
+            {% for produto in produtos %}
+              <option value="{{ produto.id }}" data-preco="{{ produto.preco_venda }}">{{ produto.nome }} - R$ {{ '%.2f'|format(produto.preco_venda) }}</option>
+            {% endfor %}
+          </select>
+          <input type="number" name="quantidade" class="quantidade" min="1" value="1" required>
+        </div>
+      </div>
+      <button type="button" class="botao" onclick="adicionarProduto()">➕ Adicionar Produto</button>
+
+      <label>Forma de Pagamento:</label>
+      <select name="forma_pagamento" required>
+        <option value="avista">À Vista</option>
+        <option value="prazo">A Prazo</option>
+      </select>
+
+      <label>Observação:</label>
+      <textarea name="observacao" rows="3"></textarea>
+
+      <label>Valor Total (R$):</label>
+      <input type="text" id="valor-total" name="valor_total" readonly value="0.00">
+
+      <button type="submit" class="botao">Finalizar Venda</button>
+    </form>
   </div>
-  <button type="button" onclick="adicionarProduto()">+ Produto</button><br><br>
 
-  <label>Forma de Pagamento:</label>
-  <select name="forma_pagamento">
-    <option value="avista">À Vista</option>
-    <option value="prazo">A Prazo</option>
-  </select><br><br>
+  <script>
+    function atualizarTotal() {
+      let total = 0;
+      document.querySelectorAll('#produtos-container .produto-item').forEach(item => {
+        const select = item.querySelector('.produto-selecionado');
+        const qtdInput = item.querySelector('.quantidade');
+        const preco = parseFloat(select.selectedOptions[0].dataset.preco);
+        const qtd = parseInt(qtdInput.value) || 0;
+        total += preco * qtd;
+      });
+      document.getElementById('valor-total').value = total.toFixed(2);
+    }
 
-  <label>Observação:</label>
-  <textarea name="observacao"></textarea><br><br>
+    function adicionarProduto() {
+      const container = document.getElementById('produtos-container');
+      const item = container.querySelector('.produto-item').cloneNode(true);
+      container.appendChild(item);
+      item.querySelector('.quantidade').addEventListener('input', atualizarTotal);
+      item.querySelector('.produto-selecionado').addEventListener('change', atualizarTotal);
+      atualizarTotal();
+    }
 
-  <button type="submit">Finalizar Venda</button>
-</form>
-
-<script>
-function adicionarProduto() {
-  const container = document.getElementById("produtos-container");
-  const item = container.querySelector(".produto-item").cloneNode(true);
-  container.appendChild(item);
-}
-</script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.quantidade').forEach(el => el.addEventListener('input', atualizarTotal));
+      document.querySelectorAll('.produto-selecionado').forEach(el => el.addEventListener('change', atualizarTotal));
+      atualizarTotal();
+    });
+  </script>
+</body>
+</html>
