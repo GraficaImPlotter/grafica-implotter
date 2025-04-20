@@ -17,6 +17,9 @@ from app.initial_data.produtos import inserir_produtos_iniciais
 from sqlalchemy.future import select
 
 templates = Jinja2Templates(directory="app/templates")
+@app.get("/", response_class=HTMLResponse)
+async def pagina_publica(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
