@@ -9,42 +9,34 @@ from app.auth.dependencies import get_usuario_logado
 from app.routes.produtos import router as produtos_router
 from app.routes.clientes import router as clientes_router
 from app.routes.vendas import router as vendas_router
+from app.routes.cadastros import router as cadastros_router
 from app.auth.models import Usuario
 from app.auth.utils import gerar_hash_senha
 from app.initial_data.produtos import inserir_produtos_iniciais
+
 from sqlalchemy.future import select
 
-# Templates
 templates = Jinja2Templates(directory="app/templates")
 
-# App
 app = FastAPI()
-
-# Arquivos estáticos
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Rotas
 app.include_router(auth_router)
 app.include_router(produtos_router)
 app.include_router(clientes_router)
 app.include_router(vendas_router)
+app.include_router(cadastros_router)
 
-# Página inicial
-@app.get("/")
-def home():
-    return {"mensagem": "Sistema da Gráfica Implotter Online Iniciado"}
+# Página pública principal
+@app.get("/", response_class=HTMLResponse)
+async def pagina_publica(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 # Painel após login
 @app.get("/painel", response_class=HTMLResponse)
 async def painel(request: Request, usuario=Depends(get_usuario_logado)):
     return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
 
-# Página de cadastros
-@app.get("/cadastros", response_class=HTMLResponse)
-async def pagina_cadastros(request: Request, usuario=Depends(get_usuario_logado)):
-    return templates.TemplateResponse("cadastros.html", {"request": request, "usuario": usuario})
-
-# Ao iniciar o app
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
