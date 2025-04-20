@@ -3,31 +3,31 @@
 {% block conteudo %}
 <h1 class="titulo-pagina">Vendas Realizadas</h1>
 
-<a href="/vendas/nova" class="btn-principal">Nova Venda</a>
-
 <table class="tabela">
-    <thead>
-        <tr>
-            <th>Cliente</th>
-            <th>Data</th>
-            <th>Total</th>
-            <th>Forma Pagamento</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for venda in vendas %}
-        <tr>
-            <td>{{ venda.cliente.nome if venda.cliente else '-' }}</td>
-            <td>{{ venda.data.strftime('%d/%m/%Y %H:%M') }}</td>
-            <td>R$ {{ '%.2f'|format(venda.total) }}</td>
-            <td>{{ venda.forma_pagamento }}</td>
-            <td>
-                <a href="/vendas/{{ venda.id }}/editar">Editar</a> |
-                <a href="/vendas/{{ venda.id }}/excluir" onclick="return confirm('Deseja excluir esta venda?')">Excluir</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Cliente</th>
+      <th>Data</th>
+      <th>Forma de Pagamento</th>
+      <th>Total (R$)</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for venda in vendas %}
+    <tr>
+      <td>{{ venda.id }}</td>
+      <td>{{ venda.cliente.nome }}</td>
+      <td>{{ venda.data.strftime('%d/%m/%Y %H:%M') }}</td>
+      <td>{{ venda.forma_pagamento }}</td>
+      <td>R$ {{ '%.2f'|format(venda.total or 0) }}</td>
+      <td>
+        <a href="/vendas/{{ venda.id }}/editar" class="btn-acao">Editar</a>
+        <a href="/vendas/{{ venda.id }}/excluir" class="btn-acao btn-vermelho">Excluir</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {% endblock %}
