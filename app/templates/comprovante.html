@@ -1,27 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <title>Comprovante de Venda</title>
+  <meta charset="UTF-8">
+  <title>Comprovante | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; }
+    .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 10px; margin-top: 30px; box-shadow: 0 0 10px #ccc; }
+    h2 { text-align: center; color: #2c3e50; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #2980b9; color: white; }
+    .info { margin-bottom: 20px; }
+    .info strong { display: inline-block; width: 140px; }
+    .botoes { text-align: center; margin-top: 30px; }
+    .botoes a {
+      display: inline-block;
+      padding: 12px 25px;
+      background: #27ae60;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+      margin: 5px;
+    }
+    .botoes a:hover { background: #1e874b; }
+    .btn-whatsapp { background: #25D366; }
+    .btn-whatsapp:hover { background: #1db954; }
+  </style>
 </head>
 <body>
-  <h2>{{ empresa.nome }}</h2>
-  <p><strong>CNPJ:</strong> {{ empresa.cnpj }}</p>
-  <p><strong>Endereço:</strong> {{ empresa.endereco }}</p>
-  <p><strong>Email:</strong> {{ empresa.email }}</p>
-  <p><strong>WhatsApp:</strong> {{ empresa.whatsapp }}</p>
-  <hr>
-  <h3>Cliente: {{ cliente.nome }}</h3>
-  <p><strong>Forma de Pagamento:</strong> {{ venda.forma_pagamento }}</p>
-  <p><strong>Status:</strong> {{ venda.status }}</p>
-  <hr>
-  <h3>Itens:</h3>
-  <ul>
-    {% for item in venda.itens %}
-    <li>{{ item.nome }} - {{ item.quantidade }} x R$ {{ item.preco_unitario }}</li>
-    {% endfor %}
-  </ul>
-  <p><strong>Total:</strong> R$ {{ venda.total }}</p>
-  <p><strong>Observações:</strong> {{ venda.observacoes }}</p>
+  <div class="container">
+    <h2>Comprovante de Venda</h2>
+
+    <div class="info">
+      <p><strong>Cliente:</strong> {{ venda.cliente.nome }}</p>
+      <p><strong>Data:</strong> {{ venda.data.strftime('%d/%m/%Y %H:%M') }}</p>
+      <p><strong>Forma de Pagamento:</strong> {{ venda.forma_pagamento }}</p>
+      <p><strong>Desconto:</strong> R$ {{ '%.2f'|format(venda.desconto or 0) }}</p>
+      <p><strong>Total:</strong> <strong style="font-size: 18px;">R$ {{ '%.2f'|format(venda.total) }}</strong></p>
+    </div>
+
+    <h3>Produtos</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Qtd</th>
+          <th>Unidade</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in venda.itens %}
+        <tr>
+          <td>{{ item.produto.nome }}</td>
+          <td>{{ item.quantidade }}</td>
+          <td>{{ item.produto.unidade or '-' }}</td>
+          <td>R$ {{ '%.2f'|format(item.quantidade * item.produto.preco_venda) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="botoes">
+      <a href="/vendas" class="btn-voltar">Voltar</a>
+      <a class="btn-whatsapp" target="_blank"
+         href="https://wa.me/55{{ venda.cliente.telefone|replace('(', '')|replace(')', '')|replace('-', '')|replace(' ', '') }}?text=Olá%20{{ venda.cliente.nome }},%20segue%20o%20comprovante%20da%20sua%20venda%20no%20valor%20de%20R$%20{{ '%.2f'|format(venda.total) }}.%20Obrigado%20pela%20preferência!">
+         Enviar via WhatsApp
+      </a>
+    </div>
+  </div>
 </body>
 </html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>PIX Gerado | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav {
+      background: #34495e;
+      padding: 10px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .conteudo {
+      padding: 30px;
+      text-align: center;
+      background: white;
+      margin: 40px auto;
+      max-width: 600px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    img {
+      width: 300px;
+      height: 300px;
+      margin: 20px 0;
+    }
+    .valor {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #27ae60;
+    }
+    .btn-voltar {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #2980b9;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .btn-voltar:hover {
+      background: #1c5980;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gráfica Implotter</h1>
+  </header>
+  <nav>
+    <a href="/painel">Início</a>
+    <a href="/produtos">Produtos</a>
+    <a href="/clientes">Clientes</a>
+    <a href="/vendas">Vendas</a>
+    <a href="/logout">Sair</a>
+  </nav>
+  <div class="conteudo">
+    <h1>Pagamento via PIX</h1>
+    <p class="valor">Valor a pagar: R$ {{ '%.2f' | format(venda.valor_total) }}</p>
+    <img src="/{{ qr_code_path }}" alt="QR Code PIX">
+    <p>Escaneie com seu app bancário para pagar</p>
+    <a href="/vendas" class="btn-voltar">Voltar para Vendas</a>
+  </div>
+</body>
+</html>
