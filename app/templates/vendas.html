@@ -1,33 +1,80 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Vendas | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .conteudo { padding: 30px; }
+    h1 { text-align: center; color: #2c3e50; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background: #2980b9; color: white; }
+    .btn-acao {
+      padding: 8px 12px;
+      background: #3498db;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      margin: 2px;
+      display: inline-block;
+    }
+    .btn-vermelho {
+      background: #e74c3c;
+    }
+    .btn-acao:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gráfica Implotter</h1>
+  </header>
+  <nav>
+    <a href="/painel">Início</a>
+    <a href="/clientes">Clientes</a>
+    <a href="/produtos">Produtos</a>
+    <a href="/vendas">Vendas</a>
+    <a href="/orcamentos">Orçamentos</a>
+    <a href="/logout">Sair</a>
+  </nav>
+  <div class="conteudo">
+    <h1>Vendas Realizadas</h1>
 
-{% block conteudo %}
-<h1 class="titulo-pagina">Vendas Realizadas</h1>
+    <a href="/vendas/nova" class="btn-acao" style="margin-bottom: 20px;">Nova Venda</a>
 
-<table class="tabela">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Cliente</th>
-      <th>Data</th>
-      <th>Forma de Pagamento</th>
-      <th>Total (R$)</th>
-      <th>Ações</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for venda in vendas %}
-    <tr>
-      <td>{{ venda.id }}</td>
-      <td>{{ venda.cliente.nome }}</td>
-      <td>{{ venda.data.strftime('%d/%m/%Y %H:%M') }}</td>
-      <td>{{ venda.forma_pagamento }}</td>
-      <td>R$ {{ '%.2f'|format(venda.total or 0) }}</td>
-      <td>
-        <a href="/vendas/{{ venda.id }}/editar" class="btn-acao">Editar</a>
-        <a href="/vendas/{{ venda.id }}/excluir" class="btn-acao btn-vermelho">Excluir</a>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% endblock %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Data</th>
+          <th>Forma de Pagamento</th>
+          <th>Total (R$)</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for venda in vendas %}
+        <tr>
+          <td>{{ venda.id }}</td>
+          <td>{{ venda.cliente.nome }}</td>
+          <td>{{ venda.data.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td>{{ venda.forma_pagamento }}</td>
+          <td>R$ {{ '%.2f'|format(venda.total or 0) }}</td>
+          <td>
+            <a href="/vendas/{{ venda.id }}/editar" class="btn-acao">Editar</a>
+            <a href="/vendas/{{ venda.id }}/excluir" class="btn-acao btn-vermelho">Excluir</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
