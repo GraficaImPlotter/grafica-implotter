@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-import importlib
+from fastapi.responses import FileResponse
 
 from app.database import engine, Base, get_db
 from app.auth.routes import router as auth_router
@@ -13,7 +13,6 @@ from app.routes.vendas import router as vendas_router
 from app.routes.cadastros import router as cadastros_router
 from app.initial_data.produtos import inserir_produtos_iniciais
 
-# Cria o app
 app = FastAPI()
 
 # Monta arquivos estáticos e público
@@ -34,7 +33,7 @@ app.add_middleware(
 )
 
 # Rota pública (index)
-@app.get("/", response_class=FileResponse := importlib.import_module('fastapi.responses').FileResponse)
+@app.get("/", response_class=FileResponse)
 async def pagina_principal():
     return FileResponse("public/index.html")
 
@@ -50,6 +49,5 @@ app.include_router(cadastros_router)
 async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    # Inserir produtos iniciais
     async for db in get_db():
         await inserir_produtos_iniciais()
