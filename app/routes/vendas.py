@@ -1,25 +1,33 @@
-from fastapi import APIRouter, Request, Depends, Form
-from fastapi.responses import RedirectResponse, FileResponse
+
+from fastapi import Request, APIRouter, Depends, Form
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.auth.dependencies import get_usuario_logado
+from datetime import datetime
+
 from app.database import get_db
+from app.auth.dependencies import get_usuario_logado
 from app.models.venda import Venda
 from app.models.cliente import Cliente
 from app.pdf.venda_pdf import gerar_comprovante_pdf
-
-from datetime import datetime
+from app.utils.mercadopago import gerar_pix
 
 router = APIRouter()
 
-@router.get("/vendas")
-async def listar_vendas(request: Request, usuario=Depends(get_usuario_logado), db: AsyncSession = Depends(get_db)):
-    vendas = (await db.execute(select(Venda))).scalars().all()
-    return request.app.state.templates.TemplateResponse("vendas.html", {
-        "request": request,
-        "usuario": usuario,
-        "vendas": vendas
-    })
+@router.get("/vendas", response_class=HTMLResponse)
+async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db), usuario=Depends(get_usuario_logado), data_inicial: str = None, data_final: str = None):
+    query = select(Venda)
+
+    if data_inicial:
+        data_inicial = datetime.strptime(data_inicial, "%Y-%m-%d")
+        query = query.where(Venda.data >= data_inicial)
+
+    if data_final:
+        data_final = datetime.strptime(data_final, "%Y-%m-%d")
+        query = query.where(Venda.data <= data_final)
+
+    vendas = (await db.execute(query)).scalars().all()
+    return request.app.state.templates.TemplateResponse("vendas.html", {"request": request, "vendas": vendas, "usuario": usuario})
 
 @router.get("/vendas/nova")
 async def nova_venda(request: Request, usuario=Depends(get_usuario_logado), db: AsyncSession = Depends(get_db)):
