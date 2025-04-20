@@ -1,66 +1,61 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Nova Venda | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .conteudo { padding: 30px; max-width: 800px; margin: auto; }
+    form { background: white; padding: 20px; border-radius: 8px; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; }
+    .produtos { margin-top: 20px; }
+    .btn { background: #2980b9; color: white; border: none; padding: 10px 20px; cursor: pointer; margin-top: 20px; border-radius: 5px; }
+    .btn:hover { background: #1c5980; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Nova Venda</h1>
+  </header>
+  <nav>
+    <a href="/painel">🏠 Início</a>
+    <a href="/produtos">📦 Produtos</a>
+    <a href="/clientes">👥 Clientes</a>
+    <a href="/vendas">🧾 Vendas</a>
+    <a href="/logout">🔓 Sair</a>
+  </nav>
+  <div class="conteudo">
+    <form method="post">
+      <label for="cliente_id">Cliente</label>
+      <select name="cliente_id" required>
+        {% for cliente in clientes %}
+          <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+        {% endfor %}
+      </select>
 
-{% block conteudo %}
-<h1 class="titulo-pagina">Nova Venda</h1>
+      <label for="forma_pagamento">Forma de Pagamento</label>
+      <select name="forma_pagamento" required>
+        <option value="avista">À Vista</option>
+        <option value="prazo">A Prazo</option>
+      </select>
 
-<form method="post" class="formulario">
-    <div class="form-linha">
-        <label for="cliente_id">Cliente:</label>
-        <select name="cliente_id" required>
-            <option value="">Selecione</option>
-            {% for cliente in clientes %}
-            <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-            {% endfor %}
-        </select>
-    </div>
+      <div class="produtos">
+        <h3>Produtos</h3>
+        {% for produto in produtos %}
+          <label>
+            <input type="checkbox" name="produto_id" value="{{ produto.id }}"> {{ produto.nome }}
+          </label>
+          <input type="number" name="quantidade" placeholder="Quantidade" min="1">
+        {% endfor %}
+      </div>
 
-    <div class="form-linha">
-        <label for="forma_pagamento">Forma de Pagamento:</label>
-        <select name="forma_pagamento" required>
-            <option value="avista">À Vista</option>
-            <option value="aprazo">A Prazo</option>
-        </select>
-    </div>
-
-    <h3>Produtos:</h3>
-    <div id="produtos-container">
-        <div class="produto-linha">
-            <select name="produto_id" required>
-                <option value="">Selecione</option>
-                {% for produto in produtos %}
-                <option value="{{ produto.id }}">{{ produto.nome }} - R$ {{ '%.2f'|format(produto.preco_venda or 0) }}</option>
-                {% endfor %}
-            </select>
-            <input type="number" name="quantidade" placeholder="Quantidade" min="1" required>
-            <button type="button" onclick="removerLinha(this)">Remover</button>
-        </div>
-    </div>
-
-    <button type="button" onclick="adicionarLinha()">+ Adicionar Produto</button>
-
-    <div class="form-linha">
-        <label for="desconto">Desconto (R$):</label>
-        <input type="number" name="desconto" step="0.01" value="0">
-    </div>
-
-    <button type="submit" class="btn-principal">Salvar Venda</button>
-</form>
-
-<script>
-function adicionarLinha() {
-    const container = document.getElementById("produtos-container");
-    const novaLinha = container.children[0].cloneNode(true);
-    novaLinha.querySelector("select").value = "";
-    novaLinha.querySelector("input").value = "";
-    container.appendChild(novaLinha);
-}
-
-function removerLinha(btn) {
-    const linha = btn.parentElement;
-    const container = document.getElementById("produtos-container");
-    if (container.children.length > 1) {
-        container.removeChild(linha);
-    }
-}
-</script>
-{% endblock %}
+      <button type="submit" class="btn">Salvar Venda</button>
+    </form>
+  </div>
+</body>
+</html>

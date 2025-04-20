@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmar Exclusão | Gráfica Implotter</title>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; gap: 20px; justify-content: center; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+    .conteudo { padding: 30px; max-width: 600px; margin: auto; background: white; border-radius: 8px; text-align: center; margin-top: 40px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px; font-weight: bold; }
+    .btn-cancelar { background: #7f8c8d; color: white; }
+    .btn-excluir { background: #c0392b; color: white; }
+    .btn-cancelar:hover { background: #707b7c; }
+    .btn-excluir:hover { background: #922b21; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Confirmar Exclusão</h1>
+  </header>
+  <nav>
+    <a href="/painel">🏠 Início</a>
+    <a href="/produtos">📦 Produtos</a>
+    <a href="/clientes">👥 Clientes</a>
+    <a href="/vendas">🧾 Vendas</a>
+    <a href="/logout">🔓 Sair</a>
+  </nav>
+
+  <div class="conteudo">
+    <h2>Tem certeza que deseja excluir esta venda?</h2>
+    <p><strong>Cliente:</strong> {{ venda.cliente.nome }}</p>
+    <p><strong>Data:</strong> {{ venda.data.strftime('%d/%m/%Y %H:%M') }}</p>
+    <p><strong>Total:</strong> R$ {{ '%.2f'|format(venda.total) }}</p>
+
+    <form method="post">
+      <button type="submit" class="btn btn-excluir">Sim, Excluir</button>
+      <a href="/vendas" class="btn btn-cancelar">Cancelar</a>
+    </form>
+  </div>
+</body>
+</html>
