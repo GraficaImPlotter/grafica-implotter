@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Depends
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
@@ -18,30 +18,31 @@ from sqlalchemy.future import select
 
 app = FastAPI()
 
-# Templates
+# Templates do sistema
 templates = Jinja2Templates(directory="app/templates")
 
-# Arquivos estáticos
+# Arquivos estáticos (para sistema e para site público)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/site", StaticFiles(directory="public"), name="site")  # para carregar CSS/imagens do site público
 
-# Rotas
+# Rotas do sistema
 app.include_router(auth_router)
 app.include_router(produtos_router)
 app.include_router(clientes_router)
 app.include_router(vendas_router)
 app.include_router(cadastros_router)
 
-# Página pública principal
+# Página principal pública (index.html na raiz/public)
 @app.get("/", response_class=HTMLResponse)
-async def pagina_publica(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def pagina_publica():
+    return FileResponse("public/index.html")
 
 # Painel após login
 @app.get("/painel", response_class=HTMLResponse)
 async def painel(request: Request, usuario=Depends(get_usuario_logado)):
     return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
 
-# Evento ao iniciar o app
+# Ao iniciar o app
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
