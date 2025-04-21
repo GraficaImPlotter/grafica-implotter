@@ -16,11 +16,12 @@ from app.utils.comprovante_generator import gerar_comprovante_imagem
 
 router = APIRouter()
 
-# Listar vendas
 @router.get("/vendas")
 async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(Venda).options(selectinload(Venda.cliente)).order_by(Venda.data.desc())
+        select(Venda)
+        .options(selectinload(Venda.cliente))
+        .order_by(Venda.data.desc())
     )
     vendas = result.scalars().all()
     return request.app.state.templates.TemplateResponse("vendas.html", {
@@ -28,15 +29,14 @@ async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
         "vendas": vendas
     })
 
-# Nova venda
 @router.get("/vendas/nova")
 async def nova_venda(request: Request, db: AsyncSession = Depends(get_db)):
-    clientes = (await db.execute(select(Cliente))).scalars().all()
-    produtos = (await db.execute(select(Produto))).scalars().all()
+    result_clientes = await db.execute(select(Cliente))
+    result_produtos = await db.execute(select(Produto))
     return request.app.state.templates.TemplateResponse("venda_form.html", {
         "request": request,
-        "clientes": clientes,
-        "produtos": produtos
+        "clientes": result_clientes.scalars().all(),
+        "produtos": result_produtos.scalars().all()
     })
 
 @router.post("/vendas/nova")
@@ -87,29 +87,35 @@ async def salvar_venda(
 
     return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
 
-# Editar venda
 @router.get("/vendas/{venda_id}/editar")
-async def editar_venda(venda_id: int, request: Request, db: AsyncSession = Depends(get_db)):
-    venda = await db.get(Venda, venda_id)
+async def editar_venda(request: Request, venda_id: int, db: AsyncSession = Depends(get_db)):
+    result_venda = await db.execute(
+        select(Venda).options(selectinload(Venda.itens)).where(Venda.id == venda_id)
+    )
+    venda = result_venda.scalar_one_or_none()
+
     if not venda:
         return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
 
     clientes = (await db.execute(select(Cliente))).scalars().all()
     produtos = (await db.execute(select(Produto))).scalars().all()
-    itens = (await db.execute(select(ItemVenda).where(ItemVenda.venda_id == venda_id))).scalars().all()
 
     return request.app.state.templates.TemplateResponse("venda_editar.html", {
         "request": request,
         "venda": venda,
         "clientes": clientes,
-        "produtos": produtos,
-        "itens": itens
+        "produtos": produtos
     })
 
-# Excluir venda - confirmação
 @router.get("/vendas/{venda_id}/excluir")
-async def confirmar_exclusao_venda(venda_id: int, request: Request, db: AsyncSession = Depends(get_db)):
-    venda = await db.get(Venda, venda_id)
+async def confirmar_exclusao_venda(request: Request, venda_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
+        select(Venda)
+        .options(selectinload(Venda.cliente))
+        .where(Venda.id == venda_id)
+    )
+    venda = result.scalar_one_or_none()
+
     if not venda:
         return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
 
@@ -118,13 +124,10 @@ async def confirmar_exclusao_venda(venda_id: int, request: Request, db: AsyncSes
         "venda": venda
     })
 
-# Excluir venda - confirmação POST
 @router.post("/vendas/{venda_id}/excluir")
-async def excluir_venda(venda_id: int, db: AsyncSession = Depends(get_db)):
+async def excluir_venda(request: Request, venda_id: int, db: AsyncSession = Depends(get_db)):
     venda = await db.get(Venda, venda_id)
     if venda:
-        await db.execute(select(ItemVenda).where(ItemVenda.venda_id == venda_id).delete())
         await db.delete(venda)
         await db.commit()
-
     return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
