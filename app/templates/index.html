@@ -1,89 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gráfica Implotter</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
-    header { background: #2c3e50; padding: 20px; text-align: center; color: white; }
-    header img { height: 60px; }
-    nav { background: #34495e; padding: 10px; text-align: right; }
-    nav a { color: white; text-decoration: none; font-weight: bold; margin-right: 20px; }
-    .banner { width: 100%; overflow: hidden; }
-    .banner img { width: 100%; display: none; }
-    .vitrine { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; background: white; }
-    .item { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); text-align: center; }
-    .item img { max-width: 100%; height: 150px; object-fit: cover; }
-    .item h3 { margin: 10px 0; }
-    .item p { font-size: 14px; color: #555; }
-    .item a { display: inline-block; margin-top: 10px; background: #25d366; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; }
-    .item a:hover { background: #128c7e; }
-    footer { background: #2c3e50; color: white; padding: 15px; text-align: center; }
-    footer a { color: white; margin: 0 10px; font-size: 18px; text-decoration: none; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+    }
+
+    .carousel {
+      position: relative;
+      max-width: 100%;
+      margin: auto;
+      overflow: hidden;
+    }
+
+    .slides {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+      width: 100%;
+    }
+
+    .slide {
+      min-width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .slide img {
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .navigation {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+
+    .navigation button {
+      background-color: rgba(0,0,0,0.5);
+      border: none;
+      color: white;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      border-radius: 5px;
+    }
+
+    .navigation button:hover {
+      background-color: rgba(0,0,0,0.8);
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <img src="/static/img/logo.png" alt="Logo da Gráfica Implotter">
-</header>
-<nav>
-  <a href="/login">Login</a>
-</nav>
+  <div class="carousel">
+    <div class="slides" id="slides">
+      <div class="slide"><img src="/static/banner1.png" alt="Banner 1" /></div>
+      <div class="slide"><img src="/static/banner2.png" alt="Banner 2" /></div>
+      <div class="slide"><img src="/static/banner3.png" alt="Banner 3" /></div>
+      <div class="slide"><img src="/static/banner-arte-gratis.png" alt="Banner Arte Grátis" /></div>
+    </div>
+    <div class="navigation">
+      <button onclick="prevSlide()">❮</button>
+      <button onclick="nextSlide()">❯</button>
+    </div>
+  </div>
 
-<div class="banner">
-  <img src="/static/img/banner1.jpg" style="display:block;">
-  <img src="/static/img/banner2.jpg">
-</div>
+  <script>
+    let currentIndex = 0;
+    const slides = document.getElementById("slides");
+    const totalSlides = slides.children.length;
 
-<div class="vitrine">
-  <div class="item">
-    <img src="/static/img/cartao.jpg" alt="Cartões de Visita">
-    <h3>Cartões de Visita</h3>
-    <p>Cartões personalizados para impressionar seus clientes.</p>
-    <a href="https://wa.me/5533991449635" target="_blank">Pedir Orçamento</a>
-  </div>
-  <div class="item">
-    <img src="/static/img/panfleto.jpg" alt="Panfletos">
-    <h3>Panfletos</h3>
-    <p>Divulgue seu negócio com panfletos de qualidade.</p>
-    <a href="https://wa.me/5533991449635" target="_blank">Pedir Orçamento</a>
-  </div>
-  <div class="item">
-    <img src="/static/img/banner.jpg" alt="Banners">
-    <h3>Banners</h3>
-    <p>Banners impactantes para qualquer ocasião.</p>
-    <a href="https://wa.me/5533991449635" target="_blank">Pedir Orçamento</a>
-  </div>
-  <div class="item">
-    <img src="/static/img/adesivo.jpg" alt="Adesivos">
-    <h3>Adesivos</h3>
-    <p>Adesivos personalizados para sua marca ou evento.</p>
-    <a href="https://wa.me/5533991449635" target="_blank">Pedir Orçamento</a>
-  </div>
-  <div class="item">
-    <img src="/static/img/windbanner.jpg" alt="Windbanners">
-    <h3>Windbanners</h3>
-    <p>Windbanners para destacar seu negócio.</p>
-    <a href="https://wa.me/5533991449635" target="_blank">Pedir Orçamento</a>
-  </div>
-</div>
+    function updateSlide() {
+      slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
 
-<footer>
-  <p>Contato:</p>
-  <a href="https://wa.me/5533991449635" target="_blank">WhatsApp</a> | 
-  <a href="https://instagram.com/grafica.implotter" target="_blank">Instagram</a>
-</footer>
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % totalSlides;
+      updateSlide();
+    }
 
-<script>
-  let banners = document.querySelectorAll('.banner img');
-  let current = 0;
-  setInterval(() => {
-    banners[current].style.display = 'none';
-    current = (current + 1) % banners.length;
-    banners[current].style.display = 'block';
-  }, 4000);
-</script>
+    function prevSlide() {
+      currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+      updateSlide();
+    }
+
+    setInterval(nextSlide, 5000);
+  </script>
 
 </body>
 </html>
