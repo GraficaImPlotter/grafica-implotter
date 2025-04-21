@@ -3,7 +3,7 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from html2image import Html2Image
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "app", "templates")
 OUTPUT_DIR = os.path.join(BASE_DIR, "app", "static", "comprovantes")
 
