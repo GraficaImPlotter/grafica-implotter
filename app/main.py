@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
 
 from app.database import engine, Base, get_db
 from app.auth.routes import router as auth_router
@@ -32,10 +32,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Rota pública (index)
-@app.get("/", response_class=FileResponse)
-async def pagina_principal():
-    return FileResponse("public/index.html")
+# Página inicial pública (usa index.html do templates)
+@app.get("/", response_class=HTMLResponse)
+async def pagina_principal(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 # Painel após login
 @app.get("/painel", response_class=HTMLResponse)
