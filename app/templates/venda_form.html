@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -17,6 +16,8 @@
     .btn { background: #27ae60; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; }
     .btn:hover { background: #1e8449; }
     .valor-total { font-size: 20px; margin-top: 20px; font-weight: bold; text-align: right; color: #2c3e50; }
+    .remover-item { background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    .remover-item:hover { background: #c0392b; }
   </style>
 </head>
 <body>
@@ -51,7 +52,7 @@
       </div>
 
       <div id="itens-venda">
-        <div class="linha">
+        <div class="linha item-venda">
           <label>Produto:</label>
           <select name="produto_id" class="produto">
             {% for produto in produtos %}
@@ -60,6 +61,7 @@
           </select>
           <label>Quantidade:</label>
           <input type="number" name="quantidade" class="quantidade" step="0.01" required>
+          <button type="button" class="remover-item" onclick="removerItem(this)">Remover</button>
         </div>
       </div>
 
@@ -80,7 +82,7 @@
     function adicionarProduto() {
       const container = document.getElementById("itens-venda");
       const novaLinha = document.createElement("div");
-      novaLinha.classList.add("linha");
+      novaLinha.classList.add("linha", "item-venda");
       novaLinha.innerHTML = `
         <label>Produto:</label>
         <select name="produto_id" class="produto">
@@ -90,8 +92,15 @@
         </select>
         <label>Quantidade:</label>
         <input type="number" name="quantidade" class="quantidade" step="0.01" required>
+        <button type="button" class="remover-item" onclick="removerItem(this)">Remover</button>
       `;
       container.appendChild(novaLinha);
+    }
+
+    function removerItem(botao) {
+      const linha = botao.closest(".item-venda");
+      linha.remove();
+      calcularTotal();
     }
 
     document.addEventListener("input", calcularTotal);
