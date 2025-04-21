@@ -1,68 +1,75 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Gráfica Implotter</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <title>Gráfica Implotter - Promoções e Novidades</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
+    header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+    nav { background: #34495e; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+    nav .logo { font-size: 22px; font-weight: bold; color: white; text-decoration: none; }
+    nav .login-btn { background: #2980b9; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; }
+    nav .login-btn:hover { background: #1c5980; }
+    .conteudo { padding: 30px; text-align: center; }
+    .banner { width: 100%; max-width: 800px; margin: 20px auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    .botoes { margin: 30px 0; }
+    .botoes a {
+      display: inline-block;
+      margin: 10px;
+      padding: 15px 25px;
+      background: #27ae60;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .botoes a:hover {
+      background: #1e8449;
+    }
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #25D366;
+      color: white;
+      padding: 15px;
+      border-radius: 50%;
+      font-size: 24px;
+      text-align: center;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      text-decoration: none;
+    }
+    .whatsapp-float:hover {
+      background: #128c7e;
+    }
+  </style>
 </head>
 <body>
+
   <header>
-    <img src="logo.png" alt="Logo Gráfica Implotter">
-    <a href="/login" class="login-btn">Login</a>
+    <h1>Bem-vindo à Gráfica Implotter</h1>
+    <p>Veja nossas promoções e novidades!</p>
   </header>
 
-  <main>
-    <section class="banner">
-      <h1>Transforme sua ideia em realidade com a Gráfica Implotter</h1>
-      <p>Alta qualidade e agilidade em serviços gráficos personalizados</p>
-      <a href="#orcamento" class="btn-banner">Solicitar Orçamento</a>
-    </section>
+  <nav>
+    <a href="#" class="logo">Gráfica Implotter</a>
+    <a href="/login" class="login-btn">Login</a>
+  </nav>
 
-    <section class="produtos">
-      <h2>Produtos em Destaque</h2>
-      <div class="vitrine">
-        <div class="item">
-          <img src="https://via.placeholder.com/300x200?text=Cartões+de+Visita">
-          <h3>Cartões de Visita</h3>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x200?text=Panfletos">
-          <h3>Panfletos</h3>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x200?text=Banner">
-          <h3>Banner</h3>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x200?text=Windbanner">
-          <h3>Windbanner</h3>
-        </div>
-      </div>
-    </section>
+  <div class="conteudo">
 
-    <section class="orcamento" id="orcamento">
-      <h2>Solicite um Orçamento</h2>
-      <form>
-        <input type="text" placeholder="Seu nome" required>
-        <input type="email" placeholder="Seu e-mail" required>
-        <textarea placeholder="Descreva sua necessidade"></textarea>
-        <button type="submit">Enviar</button>
-      </form>
-    </section>
+    <img src="/static/img/banner1.jpg" alt="Promoção 1" class="banner">
+    <img src="/static/img/banner2.jpg" alt="Promoção 2" class="banner">
 
-    <section class="contato">
-      <h2>Atendimento</h2>
-      <p>Atendemos todo o Brasil</p>
-      <p>Horário: Segunda a Sexta, de 08h às 18h</p>
-    </section>
-  </main>
+    <div class="botoes">
+      <a href="https://wa.me/5533991449635?text=Olá,%20gostaria%20de%20fazer%20um%20orçamento." target="_blank">Fazer Orçamento</a>
+      <a href="/login">Acessar Painel</a>
+    </div>
 
-  <footer>
-    <p>📱 <a href="https://wa.me/5533991449635" target="_blank">(33) 99144-9635</a> |
-       📸 <a href="https://instagram.com/grafica.implotter" target="_blank">@grafica.implotter</a></p>
-    <p>&copy; 2025 Gráfica Implotter</p>
-  </footer>
+  </div>
+
+  <a class="whatsapp-float" href="https://wa.me/5533991449635" target="_blank">📱</a>
+
 </body>
 </html>
