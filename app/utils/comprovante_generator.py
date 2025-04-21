@@ -3,17 +3,18 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from html2image import Html2Image
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATES_DIR = os.path.join(BASE_DIR, "app", "templates")
-OUTPUT_DIR = os.path.join(BASE_DIR, "app", "static", "comprovantes")
+# Caminho correto para a pasta de templates
+TEMPLATES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "templates"))
+OUTPUT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static", "comprovantes"))
 
+# Garante que a pasta de comprovantes exista
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 
 def gerar_comprovante_imagem(venda, cliente, itens):
     template = env.get_template("comprovante.html")
-    html = template.render(venda=venda, cliente=cliente)
+    html = template.render(venda=venda, cliente=cliente, itens=itens)
 
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     filename = f"comprovante_{venda.id}_{timestamp}.png"
