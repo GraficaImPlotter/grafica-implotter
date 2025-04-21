@@ -16,18 +16,18 @@ from app.utils.comprovante_generator import gerar_comprovante_imagem
 
 router = APIRouter()
 
+
 @router.get("/vendas")
 async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(Venda)
-        .options(selectinload(Venda.cliente))
-        .order_by(Venda.data.desc())
+        select(Venda).options(selectinload(Venda.cliente)).order_by(Venda.data.desc())
     )
     vendas = result.scalars().all()
     return request.app.state.templates.TemplateResponse("vendas.html", {
         "request": request,
         "vendas": vendas
     })
+
 
 @router.get("/vendas/nova")
 async def nova_venda(request: Request, db: AsyncSession = Depends(get_db)):
@@ -38,6 +38,7 @@ async def nova_venda(request: Request, db: AsyncSession = Depends(get_db)):
         "clientes": result_clientes.scalars().all(),
         "produtos": result_produtos.scalars().all()
     })
+
 
 @router.post("/vendas/nova")
 async def salvar_venda(
@@ -82,52 +83,13 @@ async def salvar_venda(
 
     await db.commit()
 
-    cliente = await db.get(Cliente, cliente_id)
-    gerar_comprovante_imagem(nova_venda, cliente, itens_da_venda)
-
-    return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
-
-@router.get("/vendas/{venda_id}/editar")
-async def editar_venda(request: Request, venda_id: int, db: AsyncSession = Depends(get_db)):
-    result_venda = await db.execute(
-        select(Venda).options(selectinload(Venda.itens)).where(Venda.id == venda_id)
-    )
-    venda = result_venda.scalar_one_or_none()
-
-    if not venda:
-        return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
-
-    clientes = (await db.execute(select(Cliente))).scalars().all()
-    produtos = (await db.execute(select(Produto))).scalars().all()
-
-    return request.app.state.templates.TemplateResponse("venda_editar.html", {
-        "request": request,
-        "venda": venda,
-        "clientes": clientes,
-        "produtos": produtos
-    })
-
-@router.get("/vendas/{venda_id}/excluir")
-async def confirmar_exclusao_venda(request: Request, venda_id: int, db: AsyncSession = Depends(get_db)):
+    # Corrigido: busca novamente a venda com o cliente já carregado
     result = await db.execute(
         select(Venda)
         .options(selectinload(Venda.cliente))
-        .where(Venda.id == venda_id)
+        .where(Venda.id == nova_venda.id)
     )
-    venda = result.scalar_one_or_none()
+    venda_completa = result.scalars().first()
+    gerar_comprovante_imagem(venda_completa, venda_completa.cliente, itens_da_venda)
 
-    if not venda:
-        return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
-
-    return request.app.state.templates.TemplateResponse("confirmar_exclusao_venda.html", {
-        "request": request,
-        "venda": venda
-    })
-
-@router.post("/vendas/{venda_id}/excluir")
-async def excluir_venda(request: Request, venda_id: int, db: AsyncSession = Depends(get_db)):
-    venda = await db.get(Venda, venda_id)
-    if venda:
-        await db.delete(venda)
-        await db.commit()
     return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
