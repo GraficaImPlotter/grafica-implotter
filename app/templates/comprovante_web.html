@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Comprovante de Venda</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+    .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+    h1 { text-align: center; color: #2c3e50; }
+    .info, .produtos { margin-bottom: 20px; }
+    .pix { background: #eafaf1; padding: 10px; border-left: 4px solid #27ae60; margin-top: 20px; }
+    button { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #1e8449; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Comprovante de Venda</h1>
+
+    <div class="info">
+      <p><strong>Cliente:</strong> {{ cliente.nome }}</p>
+      <p><strong>Data:</strong> {{ venda.data.strftime('%d/%m/%Y %H:%M') }}</p>
+      <p><strong>Forma de Pagamento:</strong> {{ venda.forma_pagamento }}</p>
+    </div>
+
+    <div class="produtos">
+      <h3>Produtos</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in itens %}
+          <tr>
+            <td>{{ item.produto.nome }}</td>
+            <td>{{ item.quantidade }}</td>
+            <td>R$ {{ '%.2f'|format(item.produto.preco_venda * item.quantidade) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>Desconto:</strong> R$ {{ '%.2f'|format(venda.total + venda.desconto - venda.total) }}</p>
+    <p><strong>Total:</strong> R$ {{ '%.2f'|format(venda.total) }}</p>
+
+    <div class="pix">
+      <p><strong>Pague via PIX:</strong></p>
+      <p id="pixlink">{{ pix_link }}</p>
+      <button onclick="copiarPix()">📋 Copiar PIX</button>
+    </div>
+  </div>
+
+  <script>
+    function copiarPix() {
+      const link = document.getElementById("pixlink").innerText;
+      navigator.clipboard.writeText(link).then(() => {
+        alert("Código PIX copiado!");
+      });
+    }
+  </script>
+</body>
+</html>
