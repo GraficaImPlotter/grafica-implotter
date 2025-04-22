@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Form, Depends
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -13,7 +13,6 @@ from app.models.produto import Produto
 from app.models.item_venda import ItemVenda
 
 from app.utils.mercadopago import gerar_pix
-from app.utils.comprovante_generator import gerar_comprovante_html
 
 router = APIRouter()
 
@@ -78,14 +77,26 @@ async def salvar_venda(
 
     await db.commit()
 
-    # Geração do QR Code do MercadoPago
-    caminho_qr = await gerar_pix(total_final)
+    # Busca a venda com relacionamento completo
+    result = await db.execute(
+        select(Venda)
+        .options(
+            selectinload(Venda.cliente),
+            selectinload(Venda.itens).selectinload(ItemVenda.produto)
+        )
+        .where(Venda.id == nova_venda.id)
+    )
+    venda_completa = result.scalars().first()
 
-    # Geração do comprovante em HTML
-    cliente = await db.get(Cliente, cliente_id)
-    comprovante_path = gerar_comprovante_html(nova_venda, cliente, itens_da_venda, caminho_qr)
+    # Geração do código PIX
+    codigo_pix = await gerar_pix(venda_completa.total)
 
-    return FileResponse(comprovante_path, media_type="text/html")
+    return request.app.state.templates.TemplateResponse("comprovante.html", {
+        "request": request,
+        "venda": venda_completa,
+        "itens": venda_completa.itens,
+        "pix_code": codigo_pix
+    })
 
 @router.get("/vendas/{venda_id}/excluir")
 async def confirmar_exclusao_venda(venda_id: int, request: Request, db: AsyncSession = Depends(get_db)):

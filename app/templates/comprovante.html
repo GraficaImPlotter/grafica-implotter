@@ -1,39 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <title>Comprovante de Venda</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    h1 { color: #2c3e50; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    body { font-family: Arial; background: #f9f9f9; padding: 40px; color: #333; }
+    .comprovante { background: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #2c3e50; }
+    .info { margin-bottom: 10px; }
+    .info strong { display: inline-block; width: 120px; }
+    .pix-box { background: #f1f1f1; padding: 15px; border-radius: 5px; font-size: 16px; word-break: break-all; margin-top: 20px; }
+    .copiar { background: #27ae60; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    .copiar:hover { background: #219150; }
   </style>
 </head>
 <body>
-  <h1>Comprovante de Venda</h1>
-  <p><strong>Cliente:</strong> {{ cliente.nome }}</p>
-  <p><strong>Data:</strong> {{ venda.data.strftime('%d/%m/%Y %H:%M') }}</p>
-  <p><strong>Forma de Pagamento:</strong> {{ venda.forma_pagamento }}</p>
+  <div class="comprovante">
+    <h2>Comprovante de Venda</h2>
+    
+    <div class="info"><strong>Cliente:</strong> {{ venda.cliente.nome }}</div>
+    <div class="info"><strong>Data:</strong> {{ venda.data.strftime('%d/%m/%Y %H:%M') }}</div>
+    <div class="info"><strong>Forma de pagamento:</strong> {{ venda.forma_pagamento }}</div>
+    <div class="info"><strong>Desconto:</strong> R$ {{ '%.2f'|format(venda.desconto) }}</div>
+    <div class="info"><strong>Total:</strong> <strong>R$ {{ '%.2f'|format(venda.total) }}</strong></div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Produto</th>
-        <th>Qtd</th>
-        <th>Preço</th>
-      </tr>
-    </thead>
-    <tbody>
+    <h3>Itens da Venda</h3>
+    <ul>
       {% for item in itens %}
-      <tr>
-        <td>{{ item.produto.nome }}</td>
-        <td>{{ item.quantidade }}</td>
-        <td>R$ {{ '%.2f'|format(item.produto.preco_venda) }}</td>
-      </tr>
+        <li>{{ item.quantidade }}x {{ item.produto.nome }} - R$ {{ '%.2f'|format(item.produto.preco_venda * item.quantidade) }}</li>
       {% endfor %}
-    </tbody>
-  </table>
+    </ul>
 
-  <p><strong>Total:</strong> R$ {{ '%.2f'|format(venda.total) }}</p>
+    <h3>PIX para Pagamento:</h3>
+    <div class="pix-box" id="pix-code">{{ pix_code }}</div>
+    <button class="copiar" onclick="copiarPix()">📋 Copiar Código PIX</button>
+  </div>
+
+  <script>
+    function copiarPix() {
+      const texto = document.getElementById("pix-code").innerText;
+      navigator.clipboard.writeText(texto).then(() => {
+        alert("Código PIX copiado com sucesso!");
+      });
+    }
+  </script>
 </body>
 </html>
