@@ -1,58 +1,104 @@
-from fastapi import FastAPI, Request, Depends
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Request, Form, Depends
+from fastapi.responses import RedirectResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
+from starlette.status import HTTP_303_SEE_OTHER
+from datetime import datetime
 
-from app.database import engine, Base, get_db
-from app.auth.routes import router as auth_router
-from app.auth.dependencies import get_usuario_logado
-from app.routes.produtos import router as produtos_router
-from app.routes.clientes import router as clientes_router
-from app.routes.vendas import router as vendas_router
-from app.routes.cadastros import router as cadastros_router
-from app.initial_data.produtos import inserir_produtos_iniciais
+from app.database import get_db
+from app.models.venda import Venda
+from app.models.cliente import Cliente
+from app.models.produto import Produto
+from app.models.item_venda import ItemVenda
 
-app = FastAPI()
+from app.utils.comprovante_generator import gerar_comprovante_imagem
 
-# Monta arquivos estáticos e públicos
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-app.mount("/public", StaticFiles(directory="public"), name="public")
+router = APIRouter()
 
-# Configura os templates do Jinja2
-templates = Jinja2Templates(directory="app/templates")
-app.state.templates = templates
+@router.get("/vendas")
+async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
+        select(Venda)
+        .options(selectinload(Venda.cliente))
+        .order_by(Venda.data.desc())
+    )
+    vendas = result.scalars().all()
+    return request.app.state.templates.TemplateResponse("vendas.html", {
+        "request": request,
+        "vendas": vendas
+    })
 
-# Habilita CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+@router.get("/vendas/nova")
+async def nova_venda(request: Request, db: AsyncSession = Depends(get_db)):
+    result_clientes = await db.execute(select(Cliente))
+    result_produtos = await db.execute(select(Produto))
+    return request.app.state.templates.TemplateResponse("venda_form.html", {
+        "request": request,
+        "clientes": result_clientes.scalars().all(),
+        "produtos": result_produtos.scalars().all()
+    })
 
-# Página inicial pública (usa index.html do templates)
-@app.get("/", response_class=HTMLResponse)
-async def pagina_principal(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+@router.post("/vendas/nova")
+async def salvar_venda(
+    request: Request,
+    cliente_id: int = Form(...),
+    forma_pagamento: str = Form(...),
+    desconto: float = Form(0),
+    produto_id: list[int] = Form(...),
+    quantidade: list[str] = Form(...),
+    db: AsyncSession = Depends(get_db)
+):
+    total = 0
+    itens_da_venda = []
 
-# Painel após login
-@app.get("/painel", response_class=HTMLResponse)
-async def painel(request: Request, usuario=Depends(get_usuario_logado)):
-    return templates.TemplateResponse("painel.html", {"request": request, "usuario": usuario})
+    for pid, qtd_str in zip(produto_id, quantidade):
+        if not qtd_str.strip():
+            continue
+        qtd = float(qtd_str)
+        produto = await db.get(Produto, pid)
+        if produto:
+            subtotal = produto.preco_venda * qtd
+            total += subtotal
+            itens_da_venda.append({"produto": produto, "quantidade": qtd})
 
-# Inclui rotas de autenticação e cadastros
-app.include_router(auth_router)
-app.include_router(produtos_router)
-app.include_router(clientes_router)
-app.include_router(vendas_router)
-app.include_router(cadastros_router)
+    total_final = total - desconto
 
-# Startup: cria tabelas e insere dados iniciais
-@app.on_event("startup")
-async def on_startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    async for db in get_db():
-        await inserir_produtos_iniciais()
+    nova_venda = Venda(
+        cliente_id=cliente_id,
+        data=datetime.now(),
+        forma_pagamento=forma_pagamento,
+        total=total_final
+    )
+    db.add(nova_venda)
+    await db.flush()
+
+    for item in itens_da_venda:
+        db.add(ItemVenda(
+            venda_id=nova_venda.id,
+            produto_id=item["produto"].id,
+            quantidade=item["quantidade"]
+        ))
+
+    await db.commit()
+
+    # Busca a venda completa com cliente e itens para o comprovante
+    result = await db.execute(
+        select(Venda)
+        .options(
+            selectinload(Venda.cliente),
+            selectinload(Venda.itens).selectinload(ItemVenda.produto)
+        )
+        .where(Venda.id == nova_venda.id)
+    )
+    venda_completa = result.scalars().first()
+
+    cliente = venda_completa.cliente
+    itens = [
+        {"produto": item.produto, "quantidade": item.quantidade}
+        for item in venda_completa.itens
+    ]
+
+    gerar_comprovante_imagem(venda_completa, cliente, itens)
+
+    return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
