@@ -16,18 +16,18 @@ from app.utils.comprovante_generator import gerar_comprovante_imagem
 
 router = APIRouter()
 
-
 @router.get("/vendas")
 async def listar_vendas(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(Venda).options(selectinload(Venda.cliente)).order_by(Venda.data.desc())
+        select(Venda)
+        .options(selectinload(Venda.cliente))
+        .order_by(Venda.data.desc())
     )
     vendas = result.scalars().all()
     return request.app.state.templates.TemplateResponse("vendas.html", {
         "request": request,
         "vendas": vendas
     })
-
 
 @router.get("/vendas/nova")
 async def nova_venda(request: Request, db: AsyncSession = Depends(get_db)):
@@ -38,7 +38,6 @@ async def nova_venda(request: Request, db: AsyncSession = Depends(get_db)):
         "clientes": result_clientes.scalars().all(),
         "produtos": result_produtos.scalars().all()
     })
-
 
 @router.post("/vendas/nova")
 async def salvar_venda(
@@ -83,13 +82,48 @@ async def salvar_venda(
 
     await db.commit()
 
-    # Corrigido: busca novamente a venda com o cliente já carregado
+    # Busca a venda completa com cliente e itens para o comprovante
     result = await db.execute(
         select(Venda)
-        .options(selectinload(Venda.cliente))
+        .options(
+            selectinload(Venda.cliente),
+            selectinload(Venda.itens).selectinload(ItemVenda.produto)
+        )
         .where(Venda.id == nova_venda.id)
     )
     venda_completa = result.scalars().first()
-    gerar_comprovante_imagem(venda_completa, venda_completa.cliente, itens_da_venda)
 
+    cliente = venda_completa.cliente
+    itens = [
+        {"produto": item.produto, "quantidade": item.quantidade}
+        for item in venda_completa.itens
+    ]
+
+    gerar_comprovante_imagem(venda_completa, cliente, itens)
+
+    return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
+
+@router.get("/vendas/{venda_id}/excluir")
+async def confirmar_exclusao_venda(venda_id: int, request: Request, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
+        select(Venda)
+        .options(selectinload(Venda.cliente))
+        .where(Venda.id == venda_id)
+    )
+    venda = result.scalars().first()
+
+    if not venda:
+        return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
+
+    return request.app.state.templates.TemplateResponse("confirmar_exclusao_venda.html", {
+        "request": request,
+        "venda": venda
+    })
+
+@router.post("/vendas/{venda_id}/excluir")
+async def excluir_venda(venda_id: int, db: AsyncSession = Depends(get_db)):
+    venda = await db.get(Venda, venda_id)
+    if venda:
+        await db.delete(venda)
+        await db.commit()
     return RedirectResponse("/vendas", status_code=HTTP_303_SEE_OTHER)
